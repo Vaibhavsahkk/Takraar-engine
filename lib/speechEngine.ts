@@ -1,6 +1,5 @@
 // Web Speech API Engine for Real-Time Dictation and Heated Voice Synthesis
 
-// Type definitions for Web Speech API
 interface SpeechRecognitionEvent extends Event {
   results: SpeechRecognitionResultList;
   resultIndex: number;
@@ -8,6 +7,7 @@ interface SpeechRecognitionEvent extends Event {
 
 interface SpeechRecognitionErrorEvent extends Event {
   error: string;
+  message?: string;
 }
 
 interface SpeechRecognitionInstance extends EventTarget {
@@ -20,6 +20,7 @@ interface SpeechRecognitionInstance extends EventTarget {
   onresult: ((event: SpeechRecognitionEvent) => void) | null;
   onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
   onend: (() => void) | null;
+  onstart: (() => void) | null;
 }
 
 declare global {
@@ -55,30 +56,71 @@ export const SUPPORTED_LANGUAGES: VoiceLanguage[] = [
 
 class SpeechEngine {
   private recognition: SpeechRecognitionInstance | null = null;
+  private wantListening: boolean = false;
   private isListening: boolean = false;
-  private currentUtterance: SpeechSynthesisUtterance | null = null;
+  private onEndCallback: (() => void) | null = null;
+  private onStartCallback: (() => void) | null = null;
 
-  // Check if speech recognition is available in browser
   public isRecognitionSupported(): boolean {
     if (typeof window === "undefined") return false;
     return !!(window.SpeechRecognition || window.webkitSpeechRecognition);
   }
 
-  // Start continuous mic listening in specified language
-  public startListening(
+  // Explicitly prompt for hardware microphone permission
+  public async requestMicPermission(): Promise<{ granted: boolean; error?: string }> {
+    if (typeof window === "undefined" || !navigator?.mediaDevices?.getUserMedia) {
+      return { granted: false, error: "Audio capture API is not supported in this browser." };
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      // Release stream immediately once permission is verified
+      stream.getTracks().forEach((track) => track.stop());
+      return { granted: true };
+    } catch (err: unknown) {
+      const errName = (err as { name?: string })?.name || "";
+      if (errName === "NotAllowedError" || errName === "PermissionDeniedError") {
+        return {
+          granted: false,
+          error: "Microphone permission was blocked. Please click the lock or camera icon in your browser address bar to allow microphone access, then refresh.",
+        };
+      }
+      return { granted: false, error: (err as Error)?.message || "Microphone access failed." };
+    }
+  }
+
+  // Start continuous mic listening with live interim text stream
+  public async startListening(
     langCode: string,
     onTranscript: (text: string, isFinal: boolean) => void,
-    onError: (err: string) => void
+    onError: (err: string) => void,
+    onStart?: () => void,
+    onEnd?: () => void
   ) {
     if (typeof window === "undefined") return;
+
     const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRec) {
-      onError("Speech recognition not supported in this browser. You can type directly!");
+      onError("Speech recognition is not supported in this browser. Please use Chrome, Edge, Safari, or Brave.");
       return;
     }
 
-    if (this.isListening && this.recognition) {
-      this.recognition.abort();
+    // Verify microphone permission first
+    const perm = await this.requestMicPermission();
+    if (!perm.granted && perm.error) {
+      onError(perm.error);
+      return;
+    }
+
+    this.wantListening = true;
+    this.onStartCallback = onStart || null;
+    this.onEndCallback = onEnd || null;
+
+    if (this.recognition) {
+      try {
+        this.recognition.abort();
+      } catch {
+        // ignore
+      }
     }
 
     const langObj = SUPPORTED_LANGUAGES.find((l) => l.code === langCode);
@@ -90,50 +132,86 @@ class SpeechEngine {
       this.recognition.interimResults = true;
       this.recognition.lang = bcp47;
 
-      this.recognition.onresult = (event: SpeechRecognitionEvent) => {
-        let interim = "";
-        let final = "";
+      this.recognition.onstart = () => {
+        this.isListening = true;
+        if (this.onStartCallback) this.onStartCallback();
+      };
 
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
+      this.recognition.onresult = (event: SpeechRecognitionEvent) => {
+        let fullTranscript = "";
+        let isFinal = false;
+
+        for (let i = 0; i < event.results.length; ++i) {
+          fullTranscript += event.results[i][0].transcript;
           if (event.results[i].isFinal) {
-            final += event.results[i][0].transcript;
-          } else {
-            interim += event.results[i][0].transcript;
+            isFinal = true;
           }
         }
 
-        if (final.trim()) {
-          onTranscript(final.trim(), true);
-        } else if (interim.trim()) {
-          onTranscript(interim.trim(), false);
+        if (fullTranscript.trim()) {
+          onTranscript(fullTranscript.trim(), isFinal);
         }
       };
 
       this.recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-        if (event.error !== "no-speech") {
-          console.warn("Speech recognition error:", event.error);
-          onError(`Mic error: ${event.error}`);
+        // 'no-speech' is routine pause between sentences, keep listening
+        if (event.error === "no-speech") {
+          return;
         }
+
+        if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+          this.wantListening = false;
+          this.isListening = false;
+          onError("Microphone permission denied. Allow mic access in browser settings.");
+          return;
+        }
+
+        if (event.error === "network") {
+          console.warn("Speech recognition network error, retrying...");
+          return;
+        }
+
+        console.warn("Speech recognition error:", event.error);
       };
 
       this.recognition.onend = () => {
-        this.isListening = false;
+        // Chrome frequently stops speech recognition after short silence pauses.
+        // If the user hasn't explicitly clicked stop, auto-restart to stay live.
+        if (this.wantListening) {
+          try {
+            this.recognition?.start();
+          } catch {
+            this.isListening = false;
+            if (this.onEndCallback) this.onEndCallback();
+          }
+        } else {
+          this.isListening = false;
+          if (this.onEndCallback) this.onEndCallback();
+        }
       };
 
       this.recognition.start();
-      this.isListening = true;
     } catch (e) {
       console.error(e);
-      onError("Could not start microphone.");
+      this.wantListening = false;
       this.isListening = false;
+      onError("Failed to initialize microphone.");
     }
   }
 
-  // Stop listening
+  // Stop listening explicitly
   public stopListening() {
-    if (this.recognition && this.isListening) {
-      this.recognition.stop();
-      this.isListening = false;
+    this.wantListening = false;
+    this.isListening = false;
+    if (this.recognition) {
+      try {
+        this.recognition.stop();
+      } catch {
+        // ignore
+      }
+    }
+    if (this.onEndCallback) {
+      this.onEndCallback();
     }
   }
 
@@ -141,35 +219,29 @@ class SpeechEngine {
     return this.isListening;
   }
 
-  // Interrupt Speech Synthesis immediately (Barge-In)
+  // Preempt active speech synthesis immediately (Barge-In)
   public interruptSpeech() {
     if (typeof window !== "undefined" && "speechSynthesis" in window) {
       window.speechSynthesis.cancel();
-      this.currentUtterance = null;
     }
   }
 
-  // Speak with heated emotional inflection: higher pitch and faster rate as heat rises!
+  // Speak with dynamic thermal scaling
   public speak(text: string, langCode: string, heatScore: number = 50) {
     if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
 
-    // Cut off any existing speech first (interruption priority)
     window.speechSynthesis.cancel();
 
     const utterance = new SpeechSynthesisUtterance(text);
     const langObj = SUPPORTED_LANGUAGES.find((l) => l.code === langCode);
     utterance.lang = langObj ? langObj.bcp47 : "en-US";
 
-    // Dynamic rate & pitch scaling for arguments
-    // Heat 0 -> rate 1.0, pitch 1.0
-    // Heat 100 -> rate 1.25, pitch 1.2 (urgent, heated, breathless)
-    const rateMultiplier = 1.0 + (heatScore / 100) * 0.28;
-    const pitchMultiplier = 0.95 + (heatScore / 100) * 0.3;
+    const rateMultiplier = 1.0 + (heatScore / 100) * 0.25;
+    const pitchMultiplier = 0.95 + (heatScore / 100) * 0.25;
 
-    utterance.rate = Math.min(1.4, Math.max(0.9, rateMultiplier));
-    utterance.pitch = Math.min(1.4, Math.max(0.9, pitchMultiplier));
+    utterance.rate = Math.min(1.35, Math.max(0.9, rateMultiplier));
+    utterance.pitch = Math.min(1.3, Math.max(0.95, pitchMultiplier));
 
-    // Try finding a matching native voice
     const voices = window.speechSynthesis.getVoices();
     const prefix = langObj ? langObj.code : "en";
     const voice = voices.find(
@@ -179,7 +251,6 @@ class SpeechEngine {
       utterance.voice = voice;
     }
 
-    this.currentUtterance = utterance;
     window.speechSynthesis.speak(utterance);
   }
 }

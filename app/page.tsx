@@ -28,7 +28,6 @@ export default function ArenaPage() {
 
   // Language & Audio
   const [userLang, setUserLang] = useState<string>("en");
-  const [isListening, setIsListening] = useState<boolean>(false);
 
   // Live Debate State
   const [messages, setMessages] = useState<DebateMessage[]>([]);
@@ -176,10 +175,7 @@ export default function ArenaPage() {
 
   // Send a message from the User
   const handleSendMessage = async (text: string, isInterruption: boolean = false) => {
-    if (isListening) {
-      speechEngine.stopListening();
-      setIsListening(false);
-    }
+    speechEngine.stopListening();
 
     // Cut off opponent speech if interrupting
     if (isInterruption) {
@@ -311,27 +307,6 @@ export default function ArenaPage() {
     }
   };
 
-  // Toggle Microphone dictation
-  const handleToggleListening = () => {
-    if (isListening) {
-      speechEngine.stopListening();
-      setIsListening(false);
-    } else {
-      speechEngine.startListening(
-        userLang,
-        (transcript, isFinal) => {
-          if (isFinal && transcript.trim()) {
-            handleSendMessage(transcript.trim(), false);
-          }
-        },
-        (error) => {
-          console.warn(error);
-          setIsListening(false);
-        }
-      );
-      setIsListening(true);
-    }
-  };
 
   // Custom Arena creation
   const handleCustomScenario = (topic: string, crux: string, opponentLang: string) => {
@@ -434,8 +409,6 @@ export default function ArenaPage() {
         userLang={userLang}
         onChangeUserLang={setUserLang}
         opponentName={mode === "solo" ? currentScenario.opponentName : "Opponent"}
-        isListening={isListening}
-        onToggleListening={handleToggleListening}
         quickRetorts={getQuickRetorts()}
       />
 
