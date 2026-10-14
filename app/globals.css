@@ -1,0 +1,124 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --background: #08090a;
+    --foreground: #f4f4f0;
+    --card: #121316;
+    --card-border: #23252a;
+    --muted: #8b8e98;
+    --heat-color: #3b82f6;
+    --heat-glow: rgba(59, 130, 246, 0.25);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    overflow-x: hidden;
+  }
+}
+
+/* Thermal border animation */
+@keyframes thermalPulse {
+  0%, 100% {
+    box-shadow: inset 0 0 40px var(--heat-glow), 0 0 25px var(--heat-glow);
+  }
+  50% {
+    box-shadow: inset 0 0 80px var(--heat-glow), 0 0 50px var(--heat-glow);
+  }
+}
+
+.thermal-ambient {
+  animation: thermalPulse 3s ease-in-out infinite;
+}
+
+/* Shake animation for heated words */
+@keyframes violentShake {
+  0% { transform: translate(1px, 1px) rotate(0deg); }
+  10% { transform: translate(-1px, -2px) rotate(-1deg); }
+  20% { transform: translate(-3px, 0px) rotate(1deg); }
+  30% { transform: translate(3px, 2px) rotate(0deg); }
+  40% { transform: translate(1px, -1px) rotate(1deg); }
+  50% { transform: translate(-1px, 2px) rotate(-1deg); }
+  60% { transform: translate(-3px, 1px) rotate(0deg); }
+  70% { transform: translate(3px, 1px) rotate(-1deg); }
+  80% { transform: translate(-1px, -1px) rotate(1deg); }
+  90% { transform: translate(1px, 2px) rotate(0deg); }
+  100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+
+.shake-heated {
+  display: inline-block;
+  animation: violentShake 0.4s infinite;
+  color: #ff3b30;
+  font-weight: 700;
+}
+
+/* Interruption slash effect */
+@keyframes flashRed {
+  0% { background-color: rgba(255, 59, 48, 0.4); }
+  100% { background-color: transparent; }
+}
+
+.interruption-flash {
+  animation: flashRed 0.6s ease-out;
+}
+
+/* CRT grain overlay */
+.grain-overlay {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+/* Brutalist raise effect */
+.btn-brutalist {
+  border: 1px solid #2e323b;
+  box-shadow: 3px 3px 0px #000;
+  transition: all 0.1s ease;
+}
+
+.btn-brutalist:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0px #000;
+}
+
+.btn-brutalist:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #000;
+}
+
+.btn-interrupt {
+  background: linear-gradient(135deg, #ff3b30, #d70015);
+  box-shadow: 0 0 20px rgba(255, 59, 48, 0.5), 3px 3px 0px #000;
+  transition: all 0.15s ease;
+}
+
+.btn-interrupt:hover {
+  background: linear-gradient(135deg, #ff453a, #e00018);
+  box-shadow: 0 0 30px rgba(255, 59, 48, 0.8), 4px 4px 0px #000;
+  transform: scale(1.02);
+}
+
+.btn-interrupt:active {
+  transform: scale(0.98);
+  box-shadow: 0 0 10px rgba(255, 59, 48, 0.3), 1px 1px 0px #000;
+}
+
+/* Audio wave bar animation */
+@keyframes wavePulse {
+  0%, 100% { height: 4px; }
+  50% { height: 28px; }
+}
+
+.wave-bar {
+  animation: wavePulse 0.8s ease-in-out infinite;
+}
+
+/* Hide scrollbars */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
