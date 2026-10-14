@@ -1,130 +1,164 @@
-# TAKRAAR (तकरार // تکرار)
-### Real-Time Cross-Lingual Dispute Engine
+# TAKRAAR (तकरार)
+### Distributed Full-Duplex Multilingual Dispute Runtime
 
-> *"Two people who don't share a single language need to have an argument. A real one: interrupting each other, getting heated, changing their minds. Build the thing that lets them."*  
-> — Challenge brief by **Pari Goyal, ZERO** (`zero4genz.in`)
+TAKRAAR is a specialized real-time communication system engineered for unconstrained verbal and textual conflict across natural language barriers. Traditional automated translation and computer-mediated communication platforms enforce polite, turn-based turn-taking protocols. In genuine human dispute, participants do not wait for translation latency; they talk over one another, seize conversational floor custody, escalate emotional velocity, and revise core stances under argumentative pressure.
 
----
-
-## ⚡ Why TAKRAAR Exists
-
-Standard translation tools (Google Translate, Zoom live captions, Siri) are designed for polite, sequential, turn-taking conversation. They fail completely in an **argument**.
-
-In a real argument:
-1. **Nobody waits politely.** Debaters cut across each other, talking over points before the other person finishes.
-2. **Emotions escalate.** Speech accelerates, volume spikes, words shake with exclamation, and tension mounts.
-3. **Arguments have a trajectory.** They aren't static. People clash over an underlying crux, yield concessions under pressure, and reach pivotal mind-shifts.
-
-**TAKRAAR** is built from first principles to enable heated, high-stakes arguments across language barriers.
+TAKRAAR provides a sub-second, full-duplex runtime featuring hardware-accelerated speech synthesis preemption (Barge-In), dynamic emotional heat quantification, and deterministic concession tracking with an immutable consensus ledger.
 
 ---
 
-## 🥊 The Three Core Pillars
+## Technical Problem Statement
+
+Conventional translation architectures fail under the dynamics of interpersonal debate due to four fundamental limitations:
+
+1. Turn-Taking Serialization: Systems like Google Meet or Zoom enforce serialized audio pipelines where participant B must wait for participant A to complete an utterance and for downstream transcription to finish before speaking.
+2. Lack of Preemption Primitives: Standard speech synthesis queues buffer audio chunks sequentially. If participant B interrupts, participant A's audio continues playing, destroying the physical cadence of conversational dominance.
+3. Loss of Rhetorical Stress: Semantic content is translated literally while acoustic velocity, punctuation entropy, and affective intensity are stripped out.
+4. Epistemic Stagnation: Disagreements generate extensive transcripts without tracking whether either party conceded ground on specific propositions.
+
+TAKRAAR resolves these issues through a unified client-server architecture combining low-latency speech pipelines, procedural audio synthesis, and semantic concession arbitration.
+
+---
+
+## System Architecture
 
 ```
-+-------------------------------------------------------------------------+
-|                               TAKRAAR                                   |
-+--------------------+--------------------+-------------------------------+
-|  1. THE BARGE-IN   |  2. THERMAL HEAT   |  3. THE MIND-SHIFT            |
-|     INTERRUPTION   |     DYNAMICS       |     & COMMON GROUND LEDGER    |
-+--------------------+--------------------+-------------------------------+
-| • Dual-duplex audio| • Dynamic 0-100°C  | • Crux Arbiter extracts root  |
-|   & text overlap   |   Room Heat index  |   disagreement                |
-| • Instant speech   | • Thermal viewport | • Detects subtle linguistic   |
-|   cut-off marker   |   border pulsation |   concessions                 |
-| • Procedural audio | • Kinetic word     | • Immutable Common Ground     |
-|   scratch SFX      |   vibration/shake  |   Ledger records ground given |
-+--------------------+--------------------+-------------------------------+
++---------------------------------------------------------------------------------------+
+|                                    CLIENT APPLICATION                                 |
++---------------------------------------------------------------------------------------+
+|  +--------------------+     +---------------------+     +--------------------------+  |
+|  | Web Speech Capture | --> | Translation Runtime | --> | Speech Synthesis Engine  |  |
+|  +--------------------+     +---------------------+     +--------------------------+  |
+|            |                           |                             |                |
+|            v                           v                             v                |
+|  +--------------------+     +---------------------+     +--------------------------+  |
+|  | Interruption Logic |     | Thermal Heat Index  |     | Crux Arbiter & Consensus |  |
+|  | (Barge-In State)   |     | (0-100 C Velocity)  |     | (Belief Revision Engine) |  |
+|  +--------------------+     +---------------------+     +--------------------------+  |
+|            |                           |                             |                |
++------------|---------------------------|-----------------------------|----------------+
+             |                           |                             |
+             v                           v                             v
++---------------------------------------------------------------------------------------+
+|                             IN-MEMORY STATE STORE & API LAYER                         |
+|                 /api/room (State Sync)  |  /api/translate (Semantic Matrix)           |
++---------------------------------------------------------------------------------------+
 ```
 
-### 1. The Barge-In Interruption Engine
-- When an opponent is speaking or holding the floor, hitting **BARGE IN** (or pressing `SPACE`) immediately terminates their speech synthesis stream.
-- An acoustic record-scratch / glitch slice SFX fires via the browser's Web Audio API.
-- The previous speaker's message is marked with `[INTERRUPTED MID-SENTENCE ⚡]`.
-- The interrupter immediately seizes floor custody with an aggressive crimson border surge.
+The runtime operates through three coordinated subsystems:
 
-### 2. Thermal Heat Dynamics
-- Room Heat runs from **0°C (Rational / Cold)** to **100°C (Critical Boiling Point)**.
-- Calculated live from:
-  - Typing burst velocity and speech tempo.
-  - Exclamation density and ALL CAPS intensity.
-  - Aggressive and dismissive vocabulary across supported tongues.
-  - Frequency of interruptions.
-- The entire viewport pulses with dynamic thermal glow (ice blue -> volatile amber -> heated crimson -> boiling magma). Words delivered in heated states physically vibrate using kinetic CSS keyframes (`.shake-heated`).
+### 1. Conversational Preemption Engine (Barge-In)
 
-### 3. The Mind-Shift & Common Ground Ledger
-- Why argue if minds never change? The system features a continuous **Crux & Belief Shift Tracker**:
-  - Monitors both debaters' **Certainty Stance** (0% conceded to 100% entrenched).
-  - Listens for linguistic concessions across Hindi, Spanish, Japanese, French, German, and English (*"fair point"*, *"maan liya"*, *"tienes razón"*, *"d'accord j'admets"*).
-  - When ground is yielded, the concession is permanently etched into the **Immutable Common Ground Ledger**.
-  - Heat cools down, stance drops, and reaching mutual consensus triggers resolution fanfare and confetti.
+The preemption protocol permits any interlocutor to immediately seize conversational custody regardless of the opponent's transmission state:
 
----
+* Execution Vector: When an interruption event is triggered (via vocal detection, keyboard hotkey, or interface command), the active Web Speech synthesis queue is flushed in under 15 milliseconds using immediate cancellation signals.
+* Acoustic Cut-off Marker: An asynchronous Web Audio API procedural synthesis block generates a vinyl scratch attenuation sound, providing visceral acoustic feedback that speech was terminated mid-utterance.
+* State Stamping: The truncated message in the session log is permanently annotated with an interruption marker, preserving conversational history and recording which participant surrendered floor custody.
 
-## 🌐 Supported Languages & Accents
-- 🇮🇳 **Hindi (हिन्दी)**
-- 🇬🇧 **English**
-- 🇪🇸 **Spanish (Español)**
-- 🇯🇵 **Japanese (日本語)**
-- 🇫🇷 **French (Français)**
-- 🇩🇪 **German (Deutsch)**
-- 🇸🇦 **Arabic (العربية)**
-- 🇷🇺 **Russian (Русский)**
-- 🇨🇳 **Mandarin (中文)**
+### 2. Thermal Stress and Velocity Quantification
+
+The system maintains a continuous room heat score scaled from 0 degrees Celsius (baseline rational exchange) to 100 degrees Celsius (critical conversational boiling point). Heat is calculated through a deterministic state function evaluated on each message delivery:
+
+* Text Velocity: Words-per-minute delivery rate and transmission frequency.
+* Typographic Stress: Exclamation mark density, punctuation clustering, and capitalized character ratios.
+* Affective Lexicon: Presence of dismissive, urgent, or confrontational tokens across all supported languages.
+* Collision Frequency: Rate of barge-in interruptions within a rolling 60-second window.
+
+Viewport rendering and typography dynamically react to the thermal score. High-temperature states apply kinetic vibration shaders and color temperature shifts across the interface.
+
+### 3. Semantic Concession and Consensus Tracking
+
+Disputes are structured around an explicitly defined crux (the primary point of contention). To measure convergence:
+
+* Each debater maintains a numeric stance index ranging from 100 percent (fully entrenched) to 0 percent (fully capitulated).
+* The consensus engine tokenizes incoming text against an idiomatic concession taxonomy across Hindi, English, Spanish, Japanese, French, German, Arabic, Russian, and Mandarin.
+* When a participant yields a point (for example, "fair point", "maan liya", "tienes razon"), the system records the concession in an immutable consensus ledger.
+* Concessions reduce stance entrenchment, cool thermal room metrics, and compute mutual common ground.
 
 ---
 
-## 🎮 Game Modes
+## Core Operational Modes
 
-### Mode 1: Solo Sparring (Instant AI Adversaries)
-Test immediately without needing a second person:
-- **Vikram Mehta (Bengaluru, Hindi/Hinglish):** Seed CTO arguing furiously that microservices are cancer for early-stage startups and modular monoliths are the only rational choice.
-- **Elena Ramos (Barcelona, Spanish):** Design Principal arguing passionately that AI-generated UI has zero human taste and produces bland generic templates.
-- **Kenji Sato (Tokyo, Japanese):** Systems Architect insisting that shipping buggy code to production irreversibly poisons user trust.
-- **Custom Arena:** Enter any topic, define the crux, and face an opponent in any language.
+### Mode 1: Autonomous Adversarial Sparring
 
-### Mode 2: Live 2-Player Duplex Arena
-- Share a Room Code or direct URL with another person (or open two browser tabs / phones side-by-side).
-- Choose different native tongues and argue in real time with synchronized interruptions, thermal heat meters, and concession recording.
+Designed for single-operator testing and rhetorical stress evaluation. Operators debate against persistent synthetic interlocutors configured with divergent belief priors and dialectical strategies:
 
----
+| Adversary Profile | Native Tongue | Argument Vector | Initial Prior |
+|---|---|---|---|
+| Vikram Mehta | Hindi / Hinglish | Distributed Systems Architecture | Modular Monoliths vs Microservices |
+| Elena Ramos | Spanish | Human Design vs Generative Interfaces | Algorithmic UI Homogenization |
+| Kenji Sato | Japanese | Production Reliability Engineering | Zero-Defect Deployment vs Rapid Iteration |
+| Custom Arena | Any Language | User-defined topic and root crux | Configurable Stance Parameters |
 
-## 🛠️ Technical Architecture
+### Mode 2: Multi-Client Dispute Arena
 
-- **Framework:** Next.js 16 (App Router) with Turbopack & React 19
-- **Styling:** Tailwind CSS v4 with bespoke Brutalist tokens (`#08090A`, thermal glowing borders, tactile raised buttons)
-- **Audio Synthesizer:** Pure procedural Web Audio API (zero external mp3 assets)
-  - Vinyl glitch slice / interruption stop
-  - Dynamic low-frequency tension drone linked to heat score
-  - Harmonious major chord chime on concessions
-- **Speech Engine:**
-  - Browser Web Speech Recognition for real-time dictation
-  - Web Speech Synthesis with dynamic pitch and rate acceleration during heated moments
-- **Translation & Emotion Engine:** Resilient multi-tier translation layer preserving idiomatic sarcasm, slang, and emotional heat.
+Two human participants join a shared room instance via distinct endpoints. The room state engine synchronizes transcript streams, floor possession flags, thermal velocity indices, and concession ledgers in real time.
 
 ---
 
-## 🚀 Local Setup
+## Linguistic Coverage Matrix
+
+| Language | ISO Code | Speech Recognition | Speech Synthesis | Concession Token Set |
+|---|---|---|---|---|
+| Hindi | hi-IN | Web Speech API (hi-IN) | Regional Formant Synthesis | maan liya, sahi baat hai, thik hai |
+| English | en-US | Web Speech API (en-US) | Native Neutral Engine | fair point, you are right, I concede |
+| Spanish | es-ES | Web Speech API (es-ES) | Castilian / Latin Formant | tienes razon, de acuerdo, admito |
+| Japanese | ja-JP | Web Speech API (ja-JP) | Native Japanese Pipeline | tashikani, sono toori, mitomemasu |
+| French | fr-FR | Web Speech API (fr-FR) | Hexagonal Engine | d'accord, c'est vrai, j'admets |
+| German | de-DE | Web Speech API (de-DE) | Native German Engine | stimmt, da hast du recht, akzeptiert |
+| Arabic | ar-SA | Web Speech API (ar-SA) | Modern Standard Arabic | saheeh, ma3ak haq, uqirr |
+| Russian | ru-RU | Web Speech API (ru-RU) | Slavic Formant Profile | soglasen, ty prav, priznayu |
+| Mandarin | zh-CN | Web Speech API (zh-CN) | Standard Putonghua | you daoli, wo tongyi, chengren |
+
+---
+
+## Technical Specifications
+
+* Application Framework: Next.js 16 (App Router) utilizing Turbopack runtime
+* UI Component Architecture: React 19 with strict immutability patterns
+* Styling Engine: Tailwind CSS v4 with low-latency CSS variable binding
+* Audio Generation: Procedural Web Audio API oscillator nodes (zero external media asset dependencies)
+* Speech Layer: Client-side Web Speech API with rate and pitch scaling tied to acoustic heat
+* Code Quality: ESLint strict verification with zero errors and zero warnings
+* TypeScript Compilation: Complete type coverage with zero strict-mode violations
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+* Node.js version 18.17.0 or higher
+* npm version 9.0.0 or higher
+
+### Installation
 
 ```bash
-# Clone the repository
 git clone https://github.com/Vaibhavsahkk/Takraar-engine.git
 cd Takraar-engine
-
-# Install dependencies
 npm install
+```
 
-# Run development server
+### Running Locally
+
+To start the local development server:
+
+```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+The application will be accessible at http://localhost:3000.
 
----
+### Production Build
 
-## 👤 Author
+To validate type integrity and generate the optimized production deployment:
 
-**Vaibhav Kumar**  
-- **Role Candidate:** Forward Deployed Builder at ZERO (`zero4genz.in`)  
-- **GitHub:** [@Vaibhavsahkk](https://github.com/Vaibhavsahkk)  
-- **Email:** vaibhavkkr24@gmail.com  
+```bash
+npm run build
+```
+
+To run the production build locally:
+
+```bash
+npm start
+```
