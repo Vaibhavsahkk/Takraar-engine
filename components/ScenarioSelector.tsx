@@ -34,24 +34,24 @@ export const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-      <div className="relative w-full max-w-2xl rounded-2xl border border-[#2e323d] bg-[#121317] p-5 sm:p-6 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4">
+      <div className="relative w-full max-w-2xl rounded-2xl border border-sky-500/30 bg-[#080d17] p-5 sm:p-6 shadow-[0_0_50px_rgba(56,189,248,0.15)] overflow-hidden max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-[#23252d]">
+        <div className="flex items-center justify-between pb-4 border-b border-[#162134]">
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-mono text-xs uppercase font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded">
-                CHALLENGE ADVERSARY
+              <span className="font-mono text-xs uppercase font-bold text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-400/30">
+                ADVERSARIAL MATRIX
               </span>
-              <span className="font-mono text-xs text-[#8b8e98]">Solo Sparring Arena</span>
+              <span className="font-mono text-xs text-[#94a3b8]">Autonomous Sparring Models</span>
             </div>
-            <h3 className="mt-1 font-mono text-lg font-bold text-[#f5f5f0]">
-              Select Debate Opponent & Language Barrier
+            <h3 className="mt-1 font-mono text-lg font-bold text-sky-100">
+              Configure Dialectical Interlocutor & Language Constraint
             </h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-md text-[#8b8e98] hover:text-[#f5f5f0] hover:bg-[#20222a] transition-colors"
+            className="p-1 rounded-md text-[#94a3b8] hover:text-sky-300 hover:bg-[#101726] transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
@@ -72,8 +72,8 @@ export const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                 }}
                 className={`cursor-pointer rounded-xl border p-4 transition-all duration-200 ${
                   isSelected
-                    ? "border-amber-500/80 bg-[#1c1d24] shadow-[0_0_15px_rgba(245,158,11,0.2)]"
-                    : "border-[#252731] bg-[#15161b] hover:border-[#383b48] hover:bg-[#191a21]"
+                    ? "border-amber-400/80 bg-[#141208] shadow-[0_0_20px_rgba(245,197,66,0.2)]"
+                    : "border-[#172235] bg-[#0b101c] hover:border-sky-400/50 hover:bg-[#0f1728]"
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">
@@ -81,89 +81,72 @@ export const ScenarioSelector: React.FC<ScenarioSelectorProps> = ({
                     <span className="text-2xl">{sc.opponentAvatar}</span>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h4 className="font-mono font-bold text-[#f5f5f0] text-sm">
+                        <h4 className="font-mono font-bold text-[#f1f5f9] text-sm">
                           {sc.opponentName}
                         </h4>
-                        <span className="rounded bg-[#22242c] px-1.5 py-0.5 font-mono text-[10px] text-[#9a9da8]">
+                        <span className="rounded bg-[#162032] border border-sky-500/20 px-1.5 py-0.5 font-mono text-[10px] text-sky-300">
                           {sc.opponentRole}
                         </span>
                       </div>
-                      <p className="font-mono text-xs text-amber-400 mt-0.5">{sc.title}</p>
+                      <p className="font-mono text-xs text-amber-300 mt-0.5">{sc.title}</p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 rounded-full border border-[#2e313b] bg-[#121316] px-2.5 py-1 text-xs font-mono">
+                  <div className="flex items-center gap-1.5 rounded-full border border-sky-500/30 bg-[#070d18] px-2.5 py-1 text-xs font-mono">
                     <span>{langObj?.flag}</span>
-                    <span className="font-semibold text-[#f5f5f0]">{langObj?.name}</span>
+                    <span className="font-semibold text-sky-200">{langObj?.name}</span>
                   </div>
                 </div>
 
-                <div className="mt-3 text-xs font-mono text-[#a5a8b4] border-t border-[#23252e] pt-2">
-                  <strong className="text-[#e2e4ec]">Crux:</strong> {sc.crux}
+                <div className="mt-3 rounded-lg border border-[#162236] bg-[#070b14] p-2.5 text-xs font-mono text-[#cbd5e1]">
+                  <span className="text-sky-400/80 font-semibold">Core Crux:</span> {sc.crux}
                 </div>
               </div>
             );
           })}
+        </div>
 
-          {/* Custom Arena Builder */}
-          <div className="mt-4 rounded-xl border border-dashed border-[#2f333f] bg-[#14151a] p-4">
-            <h4 className="flex items-center gap-2 font-mono text-xs font-bold uppercase text-amber-400">
-              <Sparkles className="h-4 w-4" />
-              Custom Debate Arena
-            </h4>
-            <form onSubmit={handleCreateCustom} className="mt-3 space-y-2.5">
-              <div>
-                <label className="block text-[11px] font-mono text-[#8b8e98] uppercase">
-                  Debate Topic
-                </label>
-                <input
-                  type="text"
-                  value={customTopic}
-                  onChange={(e) => setCustomTopic(e.target.value)}
-                  placeholder="e.g. Remote work vs in-office density for startups"
-                  className="mt-1 w-full rounded border border-[#282a35] bg-[#101115] px-3 py-1.5 font-mono text-xs text-[#f5f5f0] focus:border-amber-500 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-mono text-[#8b8e98] uppercase">
-                  Underlying Crux
-                </label>
-                <input
-                  type="text"
-                  value={customCrux}
-                  onChange={(e) => setCustomCrux(e.target.value)}
-                  placeholder="e.g. Asynchronous deep work vs spontaneous hallway osmosis"
-                  className="mt-1 w-full rounded border border-[#282a35] bg-[#101115] px-3 py-1.5 font-mono text-xs text-[#f5f5f0] focus:border-amber-500 focus:outline-none"
-                />
-              </div>
-
-              <div className="flex items-center justify-between pt-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-mono text-[#8b8e98] uppercase">Opponent Tongue:</span>
-                  <select
-                    value={customOpponentLang}
-                    onChange={(e) => setCustomOpponentLang(e.target.value)}
-                    className="rounded border border-[#282a35] bg-[#101115] px-2 py-1 font-mono text-xs text-[#f5f5f0] focus:outline-none"
-                  >
-                    {SUPPORTED_LANGUAGES.map((l) => (
-                      <option key={l.code} value={l.code}>
-                        {l.flag} {l.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={!customTopic.trim() || !customCrux.trim()}
-                  className="btn-brutalist rounded bg-amber-500 px-3 py-1 font-mono text-xs font-bold text-black hover:bg-amber-400 disabled:opacity-40"
-                >
-                  Launch Custom Arena
-                </button>
-              </div>
-            </form>
-          </div>
+        {/* Custom Scenario Form */}
+        <div className="mt-4 border-t border-[#162134] pt-4">
+          <p className="font-mono text-xs uppercase font-bold text-sky-300 mb-2 flex items-center gap-1.5">
+            <Sparkles className="h-3.5 w-3.5 text-amber-300" /> Construct Custom Adversarial Crucible
+          </p>
+          <form onSubmit={handleCreateCustom} className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+            <input
+              type="text"
+              value={customTopic}
+              onChange={(e) => setCustomTopic(e.target.value)}
+              placeholder="Topic Domain (e.g. LLM Reasoning)"
+              className="rounded-lg border border-[#172235] bg-[#070b13] px-3 py-1.5 font-mono text-xs text-[#f1f5f9] placeholder-[#64748b] focus:border-sky-400 focus:outline-none"
+            />
+            <input
+              type="text"
+              value={customCrux}
+              onChange={(e) => setCustomCrux(e.target.value)}
+              placeholder="Root Contention Crux"
+              className="rounded-lg border border-[#172235] bg-[#070b13] px-3 py-1.5 font-mono text-xs text-[#f1f5f9] placeholder-[#64748b] focus:border-sky-400 focus:outline-none"
+            />
+            <div className="flex gap-2">
+              <select
+                value={customOpponentLang}
+                onChange={(e) => setCustomOpponentLang(e.target.value)}
+                className="flex-1 rounded-lg border border-[#172235] bg-[#070b13] px-2 py-1.5 font-mono text-xs text-sky-200 focus:outline-none cursor-pointer"
+              >
+                {SUPPORTED_LANGUAGES.map((l) => (
+                  <option key={l.code} value={l.code} className="bg-[#0b101c] text-[#f1f5f9]">
+                    {l.flag} {l.name}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="submit"
+                disabled={!customTopic.trim() || !customCrux.trim()}
+                className="rounded-lg bg-gradient-to-r from-amber-400 to-amber-300 px-3.5 py-1.5 font-mono text-xs font-bold text-black hover:shadow-[0_0_15px_rgba(245,197,66,0.3)] transition-all disabled:opacity-40"
+              >
+                Engage
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

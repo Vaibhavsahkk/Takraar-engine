@@ -39,7 +39,6 @@ export const ActionBar: React.FC<ActionBarProps> = ({
   // Keyboard shortcut: Spacebar outside input triggers Barge-In
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Trigger barge-in if pressing Space while not focused in an input
       if (e.code === "Space" && document.activeElement !== inputRef.current) {
         e.preventDefault();
         triggerBargeIn();
@@ -63,18 +62,18 @@ export const ActionBar: React.FC<ActionBarProps> = ({
   };
 
   return (
-    <div className="border-t border-[#23252a] bg-[#0c0d10] p-3 sm:p-4">
-      <div className="mx-auto max-w-4xl space-y-2.5">
-        {/* Quick Retorts / Heated Sparks */}
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
-          <span className="shrink-0 font-mono text-[10px] uppercase text-[#6d7180] mr-1">
-            ⚡ Quick Spars:
+    <div className="border-t border-[#141e30] bg-[#06080e]/95 backdrop-blur-xl p-3.5 sm:p-4">
+      <div className="mx-auto max-w-4xl space-y-3">
+        {/* Quick Retorts / Rhetorical Sparks */}
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+          <span className="shrink-0 font-mono text-[10px] uppercase text-sky-400/80 mr-1 flex items-center gap-1">
+            <Zap className="h-3 w-3 text-amber-300" /> Dialectical Sparks:
           </span>
           {quickRetorts.map((retort, idx) => (
             <button
               key={idx}
               onClick={() => handleQuickRetort(retort)}
-              className="btn-brutalist shrink-0 rounded-full bg-[#16171d] px-2.5 py-1 text-xs font-mono text-[#c6c9d4] hover:bg-[#22242c] hover:text-white transition-colors"
+              className="shrink-0 rounded-full border border-sky-500/20 bg-[#0a111e] px-3 py-1 text-xs font-mono text-sky-200 hover:border-amber-400/50 hover:text-amber-200 hover:bg-[#121929] transition-all"
             >
               {retort}
             </button>
@@ -82,35 +81,35 @@ export const ActionBar: React.FC<ActionBarProps> = ({
         </div>
 
         {/* Primary Controls Bar */}
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-          {/* THE GIANT BARGE IN BUTTON */}
+        <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center">
+          {/* THE PREEMPTION BARGE IN BUTTON */}
           <button
             onClick={triggerBargeIn}
-            title="Interrupt opponent mid-sentence (Press Space outside input)"
-            className="btn-interrupt flex items-center justify-center gap-2 rounded-lg py-2.5 px-4 font-mono font-extrabold uppercase text-white tracking-wider sm:w-48 select-none"
+            title="Preempt opponent transmission (Press Space outside input)"
+            className="btn-barge-in flex items-center justify-center gap-2 rounded-lg py-2.5 px-4 font-mono font-extrabold uppercase tracking-wider sm:w-48 select-none"
           >
             <Zap className="h-4 w-4 animate-bounce" />
             <span>BARGE IN</span>
-            <span className="hidden lg:inline text-[9px] bg-black/30 px-1 py-0.5 rounded">SPACE</span>
+            <span className="hidden lg:inline text-[9px] bg-black/40 text-white px-1.5 py-0.5 rounded font-mono">SPACE</span>
           </button>
 
           {/* Language Selector */}
-          <div className="flex items-center gap-1 shrink-0 bg-[#141519] border border-[#252831] rounded-lg px-2 py-1">
-            <span className="text-[10px] font-mono text-[#737785] uppercase">My Tongue:</span>
+          <div className="flex items-center gap-1.5 shrink-0 bg-[#090e18] border border-[#18243a] rounded-lg px-2.5 py-1.5">
+            <span className="text-[10px] font-mono text-sky-400/80 uppercase">Language:</span>
             <select
               value={userLang}
               onChange={(e) => onChangeUserLang(e.target.value)}
-              className="bg-transparent text-xs font-mono font-semibold text-[#f5f5f0] focus:outline-none cursor-pointer"
+              className="bg-transparent text-xs font-mono font-semibold text-sky-100 focus:outline-none cursor-pointer"
             >
               {SUPPORTED_LANGUAGES.map((lang) => (
-                <option key={lang.code} value={lang.code} className="bg-[#141519] text-[#f5f5f0]">
+                <option key={lang.code} value={lang.code} className="bg-[#090e18] text-[#f1f5f9]">
                   {lang.flag} {lang.name} ({lang.nativeName})
                 </option>
               ))}
             </select>
           </div>
 
-          {/* Input Box & Mic */}
+          {/* Input Box & Tactical Controls */}
           <div className="relative flex flex-1 items-center">
             <input
               ref={inputRef}
@@ -123,32 +122,32 @@ export const ActionBar: React.FC<ActionBarProps> = ({
                   handleSend(false);
                 }
               }}
-              placeholder={`Argue in your tongue... (e.g. Speak or type to challenge ${opponentName})`}
-              className="w-full rounded-lg border border-[#252831] bg-[#141519] py-2.5 pl-3.5 pr-20 font-mono text-sm text-[#f5f5f0] placeholder-[#626673] focus:border-amber-500/80 focus:outline-none focus:ring-1 focus:ring-amber-500/80 transition-all"
+              placeholder={`Argue in your native tongue against ${opponentName}...`}
+              className="w-full rounded-lg border border-[#162134] bg-[#070b13] py-2.5 pl-3.5 pr-20 font-mono text-sm text-[#f1f5f9] placeholder-[#64748b] focus:border-sky-400/70 focus:outline-none focus:ring-1 focus:ring-sky-400/50 shadow-inner transition-all"
             />
 
-            <div className="absolute right-1.5 flex items-center gap-1">
-              {/* Mic Toggle Button */}
+            <div className="absolute right-1.5 flex items-center gap-1.5">
+              {/* Voice Dictation Button */}
               <button
                 type="button"
                 onClick={onToggleListening}
-                title={isListening ? "Stop Microphone" : "Start Real-Time Voice Dictation"}
-                className={`p-1.5 rounded-md transition-colors ${
+                title={isListening ? "Halt Speech Recognition" : "Activate Speech Dictation"}
+                className={`p-1.5 rounded-md transition-all ${
                   isListening
-                    ? "bg-red-600 text-white animate-pulse"
-                    : "text-[#8b8e98] hover:text-[#f5f5f0] hover:bg-[#20222a]"
+                    ? "bg-sky-400 text-black font-bold animate-pulse shadow-[0_0_15px_rgba(56,189,248,0.7)]"
+                    : "text-[#94a3b8] hover:text-sky-300 hover:bg-[#101726]"
                 }`}
               >
                 {isListening ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
               </button>
 
-              {/* Send Button */}
+              {/* Transmit Button */}
               <button
                 type="button"
                 onClick={() => handleSend(false)}
                 disabled={!inputText.trim()}
-                title="Send argument (Enter)"
-                className="btn-brutalist rounded-md bg-[#22242c] p-1.5 text-amber-400 hover:bg-amber-500 hover:text-black transition-colors disabled:opacity-30 disabled:pointer-events-none"
+                title="Transmit Argument (Enter)"
+                className="rounded-md bg-gradient-to-r from-amber-400 to-amber-300 p-1.5 text-black font-bold hover:shadow-[0_0_15px_rgba(245,197,66,0.4)] transition-all disabled:opacity-30 disabled:pointer-events-none"
               >
                 <Send className="h-4 w-4" />
               </button>

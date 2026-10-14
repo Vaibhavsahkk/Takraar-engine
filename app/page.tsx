@@ -367,17 +367,17 @@ export default function ArenaPage() {
     }
   };
 
-  // Calculate dynamic thermal glow color for screen borders
+  // Calculate dynamic thermal glow color for screen borders (Light Sky Blue to Light Golden)
   const getThermalGlow = () => {
-    if (heatScore > 75) return "rgba(239, 68, 68, 0.4)"; // red
-    if (heatScore > 50) return "rgba(245, 158, 11, 0.35)"; // amber
-    if (heatScore > 30) return "rgba(234, 179, 8, 0.25)"; // yellow
-    return "rgba(59, 130, 246, 0.2)"; // cool blue
+    if (heatScore > 75) return "rgba(245, 197, 66, 0.45)"; // Radiant Light Golden
+    if (heatScore > 45) return "rgba(245, 197, 66, 0.3)"; // Warm Gold Amber
+    if (heatScore > 20) return "rgba(56, 189, 248, 0.28)"; // Light Sky Blue Active
+    return "rgba(56, 189, 248, 0.15)"; // Calm Ethereal Sky Blue
   };
 
   return (
     <div
-      className="flex min-h-screen flex-col bg-[#090a0d] text-[#f4f4f0] select-none grain-overlay relative transition-all duration-700"
+      className="flex min-h-screen flex-col bg-[#050608] text-[#f1f5f9] select-none grain-overlay relative transition-all duration-700"
       style={
         {
           "--heat-glow": getThermalGlow(),

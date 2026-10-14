@@ -38,18 +38,18 @@ export const CruxDashboard: React.FC<CruxDashboardProps> = ({
   const consensusProgress = Math.max(0, Math.min(100, Math.round(100 - averageStubbornness)));
 
   return (
-    <div className="border-b border-[#23252a] bg-[#0f1013] px-4 py-3 sm:px-6">
+    <div className="border-b border-[#141e30] bg-[#07090f] px-4 py-3 sm:px-6">
       <div className="mx-auto max-w-7xl">
         {/* Topic & Crux Banner */}
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <span className="font-mono text-[10px] uppercase tracking-wider text-amber-500 font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+              <span className="font-mono text-[10px] uppercase tracking-wider text-amber-300 font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-400/30">
                 ACTIVE DISPUTE CRUX
               </span>
-              <span className="text-xs font-mono text-[#8b8e98]">{topic}</span>
+              <span className="text-xs font-mono text-[#94a3b8]">{topic}</span>
             </div>
-            <h2 className="mt-1 font-mono text-sm sm:text-base font-bold text-[#f5f5f0] tracking-tight">
+            <h2 className="mt-1 font-mono text-sm sm:text-base font-bold text-[#f1f5f9] tracking-tight">
               {crux}
             </h2>
           </div>
@@ -58,56 +58,56 @@ export const CruxDashboard: React.FC<CruxDashboardProps> = ({
           <div className="flex items-center gap-4 lg:w-80">
             <div className="flex-1">
               <div className="flex items-center justify-between text-xs font-mono">
-                <span className="text-[#8b8e98] flex items-center gap-1">
-                  <Scale className="h-3.5 w-3.5 text-emerald-400" />
+                <span className="text-[#94a3b8] flex items-center gap-1.5">
+                  <Scale className="h-3.5 w-3.5 text-amber-300" />
                   Common Ground
                 </span>
-                <span className="font-bold text-emerald-400">{consensusProgress}%</span>
+                <span className="font-bold text-amber-300">{consensusProgress}%</span>
               </div>
-              <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-[#1e2025]">
+              <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-[#101726]">
                 <div
-                  className="h-full bg-gradient-to-r from-amber-500 to-emerald-400 transition-all duration-700"
+                  className="h-full bg-gradient-to-r from-sky-400 via-sky-300 to-amber-300 transition-all duration-700 rounded-full shadow-[0_0_12px_rgba(56,189,248,0.4)]"
                   style={{ width: `${consensusProgress}%` }}
                 />
               </div>
             </div>
 
             {isResolved && (
-              <div className="flex items-center gap-1 rounded bg-emerald-500/20 px-2.5 py-1 text-xs font-mono font-bold text-emerald-300 border border-emerald-500/40 animate-pulse">
+              <div className="flex items-center gap-1 rounded-md bg-amber-400/20 px-2.5 py-1 text-xs font-mono font-bold text-amber-200 border border-amber-400/50 animate-pulse shadow-[0_0_15px_rgba(245,197,66,0.3)]">
                 <Sparkles className="h-3.5 w-3.5" />
-                MIND-SHIFT RESOLVED
+                CONSENSUS REACHED
               </div>
             )}
           </div>
         </div>
 
-        {/* Debater Belief Meters */}
-        <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 pt-2 border-t border-[#1c1d22]">
-          {/* Debater A */}
-          <div className="flex items-center justify-between bg-[#141519] px-3 py-1.5 rounded border border-[#202227]">
+        {/* Debater Belief Certainty Meters */}
+        <div className="mt-3 grid grid-cols-1 gap-2.5 sm:grid-cols-2 pt-2.5 border-t border-[#121926]">
+          {/* Debater A (Sky Blue Signature) */}
+          <div className="flex items-center justify-between bg-[#08101c]/80 px-3.5 py-2 rounded-lg border border-sky-500/25 shadow-sm">
             <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-blue-400" />
-              <span className="font-mono text-xs text-[#f5f5f0] font-semibold">{debaterAName}</span>
-              <span className="text-[10px] font-mono text-[#8b8e98] uppercase">({debaterALang})</span>
+              <span className="h-2 w-2 rounded-full bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.8)]" />
+              <span className="font-mono text-xs text-sky-100 font-semibold">{debaterAName}</span>
+              <span className="text-[10px] font-mono text-sky-400/70 uppercase">({debaterALang})</span>
             </div>
             <div className="flex items-center gap-2 font-mono text-xs">
-              <span className="text-[#8b8e98]">Certainty:</span>
-              <span className={`font-bold ${debaterAStance > 60 ? "text-red-400" : "text-emerald-400"}`}>
+              <span className="text-[#94a3b8] text-[11px]">Certainty:</span>
+              <span className="font-bold text-sky-300">
                 {debaterAStance}%
               </span>
             </div>
           </div>
 
-          {/* Debater B */}
-          <div className="flex items-center justify-between bg-[#141519] px-3 py-1.5 rounded border border-[#202227]">
+          {/* Debater B (Light Golden Signature) */}
+          <div className="flex items-center justify-between bg-[#141008]/80 px-3.5 py-2 rounded-lg border border-amber-500/25 shadow-sm">
             <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-amber-400" />
-              <span className="font-mono text-xs text-[#f5f5f0] font-semibold">{debaterBName}</span>
-              <span className="text-[10px] font-mono text-[#8b8e98] uppercase">({debaterBLang})</span>
+              <span className="h-2 w-2 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(245,197,66,0.8)]" />
+              <span className="font-mono text-xs text-amber-100 font-semibold">{debaterBName}</span>
+              <span className="text-[10px] font-mono text-amber-400/70 uppercase">({debaterBLang})</span>
             </div>
             <div className="flex items-center gap-2 font-mono text-xs">
-              <span className="text-[#8b8e98]">Certainty:</span>
-              <span className={`font-bold ${debaterBStance > 60 ? "text-red-400" : "text-emerald-400"}`}>
+              <span className="text-[#94a3b8] text-[11px]">Certainty:</span>
+              <span className="font-bold text-amber-300">
                 {debaterBStance}%
               </span>
             </div>
@@ -116,8 +116,8 @@ export const CruxDashboard: React.FC<CruxDashboardProps> = ({
 
         {/* Common Ground Ledger (Points Conceded) */}
         {commonGroundLedger.length > 0 && (
-          <div className="mt-3 rounded border border-emerald-500/30 bg-emerald-950/10 p-2.5">
-            <div className="flex items-center gap-2 font-mono text-xs font-bold text-emerald-400 uppercase tracking-wider">
+          <div className="mt-3 rounded-lg border border-amber-500/30 bg-[#0a0e17] p-3 shadow-inner">
+            <div className="flex items-center gap-2 font-mono text-xs font-bold text-amber-300 uppercase tracking-wider">
               <ShieldCheck className="h-3.5 w-3.5" />
               Immutable Common Ground Ledger ({commonGroundLedger.length} conceded point
               {commonGroundLedger.length > 1 ? "s" : ""})
@@ -126,11 +126,11 @@ export const CruxDashboard: React.FC<CruxDashboardProps> = ({
               {commonGroundLedger.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-start gap-2 text-xs font-mono text-[#dcded8] bg-[#141816] px-2.5 py-1 rounded border border-emerald-900/40"
+                  className="flex items-start gap-2 text-xs font-mono text-[#cbd5e1] bg-[#0f1420] px-3 py-1.5 rounded border border-amber-500/20"
                 >
-                  <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-400" />
+                  <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-400" />
                   <div>
-                    <span className="font-semibold text-emerald-300">[{item.concededBy} yielded ground]:</span>{" "}
+                    <span className="font-semibold text-amber-300">[{item.concededBy} yielded ground]:</span>{" "}
                     {item.summary}
                   </div>
                 </div>

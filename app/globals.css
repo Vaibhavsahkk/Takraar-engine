@@ -2,119 +2,123 @@
 
 @layer base {
   :root {
-    --background: #08090a;
-    --foreground: #f4f4f0;
-    --card: #121316;
-    --card-border: #23252a;
-    --muted: #8b8e98;
-    --heat-color: #3b82f6;
-    --heat-glow: rgba(59, 130, 246, 0.25);
+    --background: #050608;
+    --foreground: #f1f5f9;
+    --card: #090c12;
+    --card-border: #161d2b;
+    --sky-accent: #38bdf8;
+    --sky-glow: rgba(56, 189, 248, 0.22);
+    --gold-accent: #f5c542;
+    --gold-glow: rgba(245, 197, 66, 0.22);
+    --muted: #94a3b8;
   }
 
   body {
     background-color: var(--background);
     color: var(--foreground);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Helvetica Neue", Arial, sans-serif;
     overflow-x: hidden;
   }
 }
 
-/* Thermal border animation */
-@keyframes thermalPulse {
+/* Luxury ambient thermal pulse transitioning between Sky Blue and Warm Gold */
+@keyframes thermalAura {
   0%, 100% {
-    box-shadow: inset 0 0 40px var(--heat-glow), 0 0 25px var(--heat-glow);
+    box-shadow: inset 0 0 50px rgba(56, 189, 248, 0.08), 0 0 30px rgba(56, 189, 248, 0.08);
   }
   50% {
-    box-shadow: inset 0 0 80px var(--heat-glow), 0 0 50px var(--heat-glow);
+    box-shadow: inset 0 0 90px rgba(245, 197, 66, 0.14), 0 0 60px rgba(245, 197, 66, 0.14);
   }
 }
 
 .thermal-ambient {
-  animation: thermalPulse 3s ease-in-out infinite;
+  animation: thermalAura 4s ease-in-out infinite;
 }
 
-/* Shake animation for heated words */
-@keyframes violentShake {
+/* Kinetic vibration for heated debate tokens */
+@keyframes kineticVibrate {
   0% { transform: translate(1px, 1px) rotate(0deg); }
-  10% { transform: translate(-1px, -2px) rotate(-1deg); }
-  20% { transform: translate(-3px, 0px) rotate(1deg); }
-  30% { transform: translate(3px, 2px) rotate(0deg); }
-  40% { transform: translate(1px, -1px) rotate(1deg); }
-  50% { transform: translate(-1px, 2px) rotate(-1deg); }
-  60% { transform: translate(-3px, 1px) rotate(0deg); }
-  70% { transform: translate(3px, 1px) rotate(-1deg); }
-  80% { transform: translate(-1px, -1px) rotate(1deg); }
-  90% { transform: translate(1px, 2px) rotate(0deg); }
-  100% { transform: translate(1px, -2px) rotate(-1deg); }
+  20% { transform: translate(-2px, 0px) rotate(0.8deg); }
+  40% { transform: translate(2px, 1px) rotate(-0.8deg); }
+  60% { transform: translate(-1px, -1px) rotate(0.5deg); }
+  80% { transform: translate(2px, -1px) rotate(-0.5deg); }
+  100% { transform: translate(1px, 1px) rotate(0deg); }
 }
 
 .shake-heated {
   display: inline-block;
-  animation: violentShake 0.4s infinite;
-  color: #ff3b30;
+  animation: kineticVibrate 0.35s infinite;
+  color: #fde68a;
+  text-shadow: 0 0 10px rgba(245, 197, 66, 0.6);
   font-weight: 700;
 }
 
-/* Interruption slash effect */
-@keyframes flashRed {
-  0% { background-color: rgba(255, 59, 48, 0.4); }
+/* Interruption collision flash */
+@keyframes flashPreemption {
+  0% { background-color: rgba(56, 189, 248, 0.28); }
+  50% { background-color: rgba(245, 197, 66, 0.22); }
   100% { background-color: transparent; }
 }
 
 .interruption-flash {
-  animation: flashRed 0.6s ease-out;
+  animation: flashPreemption 0.7s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* CRT grain overlay */
+/* Subtle luxury grain */
 .grain-overlay {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.025'/%3E%3C/svg%3E");
 }
 
-/* Brutalist raise effect */
-.btn-brutalist {
-  border: 1px solid #2e323b;
-  box-shadow: 3px 3px 0px #000;
-  transition: all 0.1s ease;
+/* Premium tactile glass buttons */
+.btn-glass {
+  background: rgba(14, 20, 31, 0.75);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  backdrop-filter: blur(12px);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.btn-brutalist:hover {
-  transform: translate(-1px, -1px);
-  box-shadow: 4px 4px 0px #000;
+.btn-glass:hover {
+  background: rgba(20, 29, 46, 0.9);
+  border-color: rgba(56, 189, 248, 0.45);
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+  transform: translateY(-1px);
 }
 
-.btn-brutalist:active {
-  transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0px #000;
+.btn-glass:active {
+  transform: translateY(1px);
 }
 
-.btn-interrupt {
-  background: linear-gradient(135deg, #ff3b30, #d70015);
-  box-shadow: 0 0 20px rgba(255, 59, 48, 0.5), 3px 3px 0px #000;
-  transition: all 0.15s ease;
+/* Tactical Barge-In Interruption Button: Electric Sky Blue to Light Golden gradient */
+.btn-barge-in {
+  background: linear-gradient(135deg, #38bdf8 0%, #0284c7 45%, #f5c542 100%);
+  color: #030712;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  box-shadow: 0 0 25px rgba(56, 189, 248, 0.45), 0 0 15px rgba(245, 197, 66, 0.3);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.btn-interrupt:hover {
-  background: linear-gradient(135deg, #ff453a, #e00018);
-  box-shadow: 0 0 30px rgba(255, 59, 48, 0.8), 4px 4px 0px #000;
+.btn-barge-in:hover {
+  background: linear-gradient(135deg, #7dd3fc 0%, #38bdf8 45%, #fde68a 100%);
+  box-shadow: 0 0 35px rgba(56, 189, 248, 0.65), 0 0 25px rgba(245, 197, 66, 0.5);
   transform: scale(1.02);
 }
 
-.btn-interrupt:active {
+.btn-barge-in:active {
   transform: scale(0.98);
-  box-shadow: 0 0 10px rgba(255, 59, 48, 0.3), 1px 1px 0px #000;
 }
 
-/* Audio wave bar animation */
+/* Audio wave pulse animation */
 @keyframes wavePulse {
   0%, 100% { height: 4px; }
-  50% { height: 28px; }
+  50% { height: 26px; }
 }
 
 .wave-bar {
   animation: wavePulse 0.8s ease-in-out infinite;
 }
 
-/* Hide scrollbars */
+/* Sleek modern scrollbars */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }

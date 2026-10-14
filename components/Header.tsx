@@ -22,103 +22,102 @@ export const Header: React.FC<HeaderProps> = ({
   roomId,
   onOpenScenarios,
 }) => {
-  // Determine heat category & color
-  let heatLabel = "Rational / Cold";
-  let heatColor = "text-blue-400";
-  let heatBarBg = "bg-blue-500";
+  // Determine heat state within the Sky Blue to Golden thermal scale
+  let heatLabel = "Calm / Rational";
+  let heatColor = "text-sky-400";
+  let heatBarBg = "bg-gradient-to-r from-sky-500 to-sky-400";
   if (heatScore > 75) {
-    heatLabel = "CRITICAL BOILING POINT";
-    heatColor = "text-red-500 animate-pulse";
-    heatBarBg = "bg-red-600";
-  } else if (heatScore > 50) {
-    heatLabel = "Heated / Passionate";
-    heatColor = "text-amber-500";
-    heatBarBg = "bg-amber-500";
-  } else if (heatScore > 30) {
-    heatLabel = "Simmering Tension";
-    heatColor = "text-yellow-400";
-    heatBarBg = "bg-yellow-500";
+    heatLabel = "Critical Tension";
+    heatColor = "text-amber-300 animate-pulse";
+    heatBarBg = "bg-gradient-to-r from-sky-400 via-amber-400 to-amber-300";
+  } else if (heatScore > 45) {
+    heatLabel = "Heated Velocity";
+    heatColor = "text-amber-400";
+    heatBarBg = "bg-gradient-to-r from-sky-500 to-amber-400";
+  } else if (heatScore > 20) {
+    heatLabel = "Active Exchange";
+    heatColor = "text-sky-300";
+    heatBarBg = "bg-gradient-to-r from-sky-600 to-sky-400";
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[#23252a] bg-[#0c0d10]/95 backdrop-blur-md px-4 py-3 sm:px-6">
+    <header className="sticky top-0 z-40 border-b border-[#131b28] bg-[#050608]/95 backdrop-blur-xl px-4 py-3 sm:px-6">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-        {/* Brand & Ethos */}
+        {/* Brand & Identity */}
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded border border-[#2e323b] bg-[#16171b] shadow-inner font-mono font-bold text-red-500 text-lg">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-sky-500/30 bg-[#0a101b] shadow-[0_0_15px_rgba(56,189,248,0.2)] font-mono font-bold text-sky-400 text-lg">
             ⚡
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-mono text-base font-extrabold uppercase tracking-widest text-[#f5f5f0]">
+              <span className="font-mono text-base font-extrabold uppercase tracking-widest bg-gradient-to-r from-sky-300 via-sky-100 to-amber-300 bg-clip-text text-transparent">
                 TAKRAAR
               </span>
-              <span className="rounded bg-[#1e2025] px-1.5 py-0.5 font-mono text-[10px] uppercase text-[#8b8e98] tracking-wider border border-[#2c2f37]">
-                v1.0 // Cross-Lingual Dispute Engine
+              <span className="rounded border border-sky-500/20 bg-[#09111c] px-2 py-0.5 font-mono text-[10px] uppercase text-sky-300 tracking-wider">
+                Full-Duplex Dispute Runtime
               </span>
             </div>
-            <p className="hidden text-xs text-[#8b8e98] sm:block">
-              Two languages. Real interruptions. Heated tempers. Mind-shifts tracked.
+            <p className="hidden text-xs text-[#94a3b8] sm:block">
+              Two languages. Sub-second preemption. Acoustic heat velocity. Consensus ledger.
             </p>
           </div>
         </div>
 
-        {/* Heat Meter Display */}
-        <div className="flex items-center gap-3 bg-[#131418] border border-[#23252a] px-3 py-1.5 rounded-md shadow-sm">
-          <Flame className={`h-4 w-4 ${heatScore > 60 ? "text-red-500 animate-bounce" : "text-amber-400"}`} />
-          <div className="flex flex-col min-w-[120px] sm:min-w-[150px]">
+        {/* Dynamic Heat Metric */}
+        <div className="flex items-center gap-3 bg-[#0a0d14] border border-[#182338] px-3.5 py-1.5 rounded-lg shadow-sm">
+          <Flame className={`h-4 w-4 ${heatScore > 50 ? "text-amber-400 animate-bounce" : "text-sky-400"}`} />
+          <div className="flex flex-col min-w-[120px] sm:min-w-[155px]">
             <div className="flex items-center justify-between text-[11px] font-mono">
-              <span className="uppercase text-[#8b8e98]">{heatLabel}</span>
+              <span className="uppercase text-[#94a3b8] text-[10px]">{heatLabel}</span>
               <span className={`font-bold ${heatColor}`}>{heatScore}°C</span>
             </div>
-            {/* Heat Progress Bar */}
-            <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-[#202227]">
+            {/* Heat Bar */}
+            <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-[#111723]">
               <div
-                className={`h-full transition-all duration-500 ${heatBarBg}`}
+                className={`h-full transition-all duration-500 rounded-full ${heatBarBg}`}
                 style={{ width: `${heatScore}%` }}
               />
             </div>
           </div>
         </div>
 
-        {/* Action Controls */}
+        {/* Global Action Controls */}
         <div className="flex items-center gap-2">
-          {/* Scenario / Mode selector */}
           {mode === "solo" ? (
             <button
               onClick={onOpenScenarios}
-              className="btn-brutalist flex items-center gap-1.5 rounded bg-[#18191e] px-3 py-1.5 font-mono text-xs text-[#e1e2e6] hover:bg-[#22242b]"
+              className="btn-glass flex items-center gap-1.5 rounded-md px-3 py-1.5 font-mono text-xs text-sky-200"
             >
-              <Zap className="h-3.5 w-3.5 text-amber-400" />
-              <span className="hidden sm:inline">Change Adversary</span>
+              <Zap className="h-3.5 w-3.5 text-amber-300" />
+              <span className="hidden sm:inline">Adversary Matrix</span>
             </button>
           ) : (
-            <div className="rounded border border-[#2e323b] bg-[#141519] px-2.5 py-1 text-xs font-mono text-[#8b8e98]">
-              Room: <span className="font-bold text-amber-400">{roomId}</span>
+            <div className="rounded-md border border-sky-500/30 bg-[#0a111c] px-3 py-1.5 text-xs font-mono text-sky-300">
+              Room: <span className="font-bold text-amber-300">{roomId}</span>
             </div>
           )}
 
           {/* Mode Switcher */}
-          <div className="flex items-center rounded border border-[#2e323b] bg-[#121316] p-0.5">
+          <div className="flex items-center rounded-md border border-[#182338] bg-[#07090e] p-0.5">
             <button
               onClick={() => onSwitchMode("solo")}
-              className={`rounded px-2.5 py-1 font-mono text-xs transition-colors ${
+              className={`rounded px-2.5 py-1 font-mono text-xs transition-all ${
                 mode === "solo"
-                  ? "bg-[#272930] text-[#f5f5f0] font-semibold"
-                  : "text-[#8b8e98] hover:text-[#f5f5f0]"
+                  ? "bg-sky-500/20 text-sky-200 border border-sky-400/40 font-semibold shadow-[0_0_10px_rgba(56,189,248,0.2)]"
+                  : "text-[#64748b] hover:text-[#94a3b8]"
               }`}
             >
-              Solo Sparring
+              Autonomous
             </button>
             <button
               onClick={() => onSwitchMode("multiplayer")}
-              className={`rounded px-2.5 py-1 font-mono text-xs transition-colors ${
+              className={`rounded px-2.5 py-1 font-mono text-xs transition-all ${
                 mode === "multiplayer"
-                  ? "bg-[#272930] text-[#f5f5f0] font-semibold"
-                  : "text-[#8b8e98] hover:text-[#f5f5f0]"
+                  ? "bg-amber-500/20 text-amber-200 border border-amber-400/40 font-semibold shadow-[0_0_10px_rgba(245,197,66,0.2)]"
+                  : "text-[#64748b] hover:text-[#94a3b8]"
               }`}
             >
-              Live 2-Player
+              Peer-to-Peer
             </button>
           </div>
 
@@ -126,9 +125,9 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={onToggleMute}
             aria-label={isMuted ? "Unmute audio" : "Mute audio"}
-            className="flex h-8 w-8 items-center justify-center rounded border border-[#2e323b] bg-[#16171b] text-[#8b8e98] hover:text-[#f5f5f0] hover:bg-[#202228] transition-colors"
+            className="flex h-8 w-8 items-center justify-center rounded-md border border-[#182338] bg-[#0a0d14] text-[#94a3b8] hover:text-sky-300 hover:border-sky-500/40 transition-colors"
           >
-            {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4 text-emerald-400" />}
+            {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4 text-sky-400" />}
           </button>
         </div>
       </div>
