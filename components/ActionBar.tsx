@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import { Mic, MicOff, Send, Zap, CornerDownLeft, Sparkles, MessageSquare } from "lucide-react";
-import { speechEngine, SUPPORTED_LANGUAGES, VoiceLanguage } from "@/lib/speechEngine";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { Mic, MicOff, Send, Zap } from "lucide-react";
+import { speechEngine, SUPPORTED_LANGUAGES } from "@/lib/speechEngine";
 import { soundEngine } from "@/lib/soundEngine";
 
 interface ActionBarProps {
@@ -29,7 +29,14 @@ export const ActionBar: React.FC<ActionBarProps> = ({
   const [inputText, setInputText] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Keyboard shortcut: Spacebar outside input or Alt+Space triggers Barge-In
+  const triggerBargeIn = useCallback(() => {
+    soundEngine.playInterruption();
+    speechEngine.interruptSpeech();
+    onBargeIn();
+    inputRef.current?.focus();
+  }, [onBargeIn]);
+
+  // Keyboard shortcut: Spacebar outside input triggers Barge-In
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Trigger barge-in if pressing Space while not focused in an input
@@ -41,14 +48,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
-
-  const triggerBargeIn = () => {
-    soundEngine.playInterruption();
-    speechEngine.interruptSpeech();
-    onBargeIn();
-    inputRef.current?.focus();
-  };
+  }, [triggerBargeIn]);
 
   const handleSend = (isInterruption: boolean = false) => {
     if (!inputText.trim()) return;

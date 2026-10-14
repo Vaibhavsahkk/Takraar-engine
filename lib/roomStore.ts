@@ -139,7 +139,6 @@ export class RoomStore {
     interrupterName: string
   ): RoomState {
     const room = this.getOrCreateRoom(roomId);
-    const interruptedId = interrupterId === room.debaterA.id ? room.debaterB.id : room.debaterA.id;
     const interruptedName = interrupterId === room.debaterA.id ? room.debaterB.name : room.debaterA.name;
 
     // Heat jumps by +15 on interruption

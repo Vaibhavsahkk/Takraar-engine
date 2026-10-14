@@ -2,18 +2,18 @@
 
 import React, { useEffect, useRef } from "react";
 import { DebateMessage } from "@/lib/roomStore";
-import { Volume2, Zap, AlertCircle, ShieldAlert, Sparkles, CheckCircle2 } from "lucide-react";
+import { Volume2, Zap, Sparkles, CheckCircle2 } from "lucide-react";
 import { speechEngine } from "@/lib/speechEngine";
 
 interface DebateArenaProps {
   messages: DebateMessage[];
   debaterAId: string;
-  debaterAName: string;
-  debaterALang: string;
-  debaterBId: string;
+  debaterAName?: string;
+  debaterALang?: string;
+  debaterBId?: string;
   debaterBName: string;
-  debaterBLang: string;
-  activeSpeakerId: string | null;
+  debaterBLang?: string;
+  activeSpeakerId?: string | null;
   heatScore: number;
   interruptionBanner: {
     interrupterName: string;
@@ -26,15 +26,9 @@ interface DebateArenaProps {
 export const DebateArena: React.FC<DebateArenaProps> = ({
   messages,
   debaterAId,
-  debaterAName,
-  debaterALang,
-  debaterBId,
   debaterBName,
-  debaterBLang,
-  activeSpeakerId,
   heatScore,
   interruptionBanner,
-  currentDraft,
   isOpponentTyping,
 }) => {
   const bottomRef = useRef<HTMLDivElement>(null);

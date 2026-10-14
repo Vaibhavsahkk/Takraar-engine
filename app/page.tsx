@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { CruxDashboard } from "@/components/CruxDashboard";
 import { DebateArena } from "@/components/DebateArena";
@@ -77,8 +77,10 @@ export default function ArenaPage() {
       const params = new URLSearchParams(window.location.search);
       const roomParam = params.get("room");
       if (roomParam) {
-        setRoomId(roomParam);
-        setMode("multiplayer");
+        queueMicrotask(() => {
+          setRoomId(roomParam);
+          setMode("multiplayer");
+        });
       }
     }
   }, []);

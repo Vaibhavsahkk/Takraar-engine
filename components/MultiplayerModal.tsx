@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { X, Copy, Check, Users, ArrowRight, Share2, QrCode } from "lucide-react";
+import { X, Copy, Check, Users } from "lucide-react";
 
 interface MultiplayerModalProps {
   isOpen: boolean;

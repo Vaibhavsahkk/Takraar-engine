@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { CheckCircle2, AlertTriangle, Scale, Sparkles, Flame, ShieldCheck } from "lucide-react";
+import { CheckCircle2, Scale, Sparkles, ShieldCheck } from "lucide-react";
 
 interface CruxDashboardProps {
   topic: string;

@@ -2,7 +2,7 @@
 
 import React from "react";
 import { SPARRING_SCENARIOS, SparringScenario } from "@/lib/sparringScenarios";
-import { X, Zap, Globe, Sparkles, Scale } from "lucide-react";
+import { X, Sparkles } from "lucide-react";
 import { SUPPORTED_LANGUAGES } from "@/lib/speechEngine";
 
 interface ScenarioSelectorProps {

@@ -1,8 +1,7 @@
 "use client";
 
 import React from "react";
-import { Volume2, VolumeX, Flame, Users, Zap, ShieldAlert, Sparkles } from "lucide-react";
-import { soundEngine } from "@/lib/soundEngine";
+import { Volume2, VolumeX, Flame, Zap } from "lucide-react";
 
 interface HeaderProps {
   heatScore: number;
@@ -69,7 +68,7 @@ export const Header: React.FC<HeaderProps> = ({
           <Flame className={`h-4 w-4 ${heatScore > 60 ? "text-red-500 animate-bounce" : "text-amber-400"}`} />
           <div className="flex flex-col min-w-[120px] sm:min-w-[150px]">
             <div className="flex items-center justify-between text-[11px] font-mono">
-              <span className="uppercase text-[#8b8e98]">Room Heat</span>
+              <span className="uppercase text-[#8b8e98]">{heatLabel}</span>
               <span className={`font-bold ${heatColor}`}>{heatScore}°C</span>
             </div>
             {/* Heat Progress Bar */}
