@@ -55,22 +55,22 @@ export const ActionBar: React.FC<ActionBarProps> = ({
     setMicError(null);
 
     if (isListening) {
+      setMicStatus("Refining transcript via Whisper Large v3...");
       speechEngine.stopListening();
       setIsListening(false);
-      setMicStatus(null);
       return;
     }
 
-    setMicStatus(`Initializing microphone for ${selectedLang.name}...`);
+    setMicStatus(`Activating Whisper Large v3 for ${selectedLang.name}...`);
 
     await speechEngine.startListening(
       userLang,
       (liveTranscript, isFinal) => {
         setInputText(liveTranscript);
-        setMicStatus(`Listening: "${liveTranscript}"`);
         if (isFinal) {
-          // Keep live text in box and prompt to send
-          setMicStatus(`Captured: "${liveTranscript}" (Press Enter or click Send)`);
+          setMicStatus(`Verified by Whisper: "${liveTranscript}" (Press Enter or click Send)`);
+        } else {
+          setMicStatus(`Listening: "${liveTranscript}"`);
         }
       },
       (errorMessage) => {
@@ -80,7 +80,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
       },
       () => {
         setIsListening(true);
-        setMicStatus(`Microphone live — Speak now in ${selectedLang.name}...`);
+        setMicStatus(`Microphone active (Whisper v3) — Speak now in ${selectedLang.name}...`);
         inputRef.current?.focus();
       },
       () => {
@@ -226,7 +226,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({
               <button
                 type="button"
                 onClick={handleToggleListening}
-                title={isListening ? "Stop Microphone" : "Start Voice Dictation"}
+                title={isListening ? "Stop & Finalize with Whisper Large v3" : "Voice Dictation (Groq Whisper Large v3)"}
                 className={`p-1.5 rounded-md transition-all ${
                   isListening
                     ? "bg-sky-400 text-black font-bold animate-pulse shadow-[0_0_15px_rgba(56,189,248,0.7)]"

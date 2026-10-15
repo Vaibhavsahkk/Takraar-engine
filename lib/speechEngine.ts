@@ -1,4 +1,4 @@
-// Web Speech API Engine for Real-Time Dictation and Heated Voice Synthesis
+// Speech Engine with Groq Whisper Large v3 Backend + Web Speech Live Interim Feedback
 
 interface SpeechRecognitionEvent extends Event {
   results: SpeechRecognitionResultList;
@@ -61,34 +61,73 @@ class SpeechEngine {
   private onEndCallback: (() => void) | null = null;
   private onStartCallback: (() => void) | null = null;
 
+  // MediaRecorder state for Groq Whisper pipeline
+  private mediaRecorder: MediaRecorder | null = null;
+  private audioChunks: Blob[] = [];
+  private mediaStream: MediaStream | null = null;
+  private activeLangCode: string = "en";
+
   public isRecognitionSupported(): boolean {
     if (typeof window === "undefined") return false;
-    return !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+    return !!(
+      window.SpeechRecognition ||
+      window.webkitSpeechRecognition ||
+      (navigator.mediaDevices && window.MediaRecorder)
+    );
   }
 
   // Explicitly prompt for hardware microphone permission
-  public async requestMicPermission(): Promise<{ granted: boolean; error?: string }> {
+  public async requestMicPermission(): Promise<{ granted: boolean; stream?: MediaStream; error?: string }> {
     if (typeof window === "undefined" || !navigator?.mediaDevices?.getUserMedia) {
       return { granted: false, error: "Audio capture API is not supported in this browser." };
     }
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      // Release stream immediately once permission is verified
-      stream.getTracks().forEach((track) => track.stop());
-      return { granted: true };
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
+      });
+      return { granted: true, stream };
     } catch (err: unknown) {
       const errName = (err as { name?: string })?.name || "";
       if (errName === "NotAllowedError" || errName === "PermissionDeniedError") {
         return {
           granted: false,
-          error: "Microphone permission was blocked. Please click the lock or camera icon in your browser address bar to allow microphone access, then refresh.",
+          error: "Microphone permission was blocked. Please click the lock icon in your browser address bar to allow microphone access, then try again.",
         };
       }
       return { granted: false, error: (err as Error)?.message || "Microphone access failed." };
     }
   }
 
-  // Start continuous mic listening with live interim text stream
+  // Transcribe recorded audio blob with Groq Whisper Large v3
+  private async transcribeWithGroq(blob: Blob, langCode: string): Promise<string | null> {
+    try {
+      const formData = new FormData();
+      formData.append("file", blob, "recording.webm");
+      formData.append("language", langCode);
+
+      const res = await fetch("/api/transcribe", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        console.warn("Groq Whisper API returned status:", res.status);
+        return null;
+      }
+
+      const data = await res.json();
+      return data.text ? data.text.trim() : null;
+    } catch (err) {
+      console.error("Failed to transcribe via Groq Whisper:", err);
+      return null;
+    }
+  }
+
+  // Start continuous mic listening with live interim text stream + Groq Whisper refinement
   public async startListening(
     langCode: string,
     onTranscript: (text: string, isFinal: boolean) => void,
@@ -98,111 +137,137 @@ class SpeechEngine {
   ) {
     if (typeof window === "undefined") return;
 
-    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRec) {
-      onError("Speech recognition is not supported in this browser. Please use Chrome, Edge, Safari, or Brave.");
-      return;
-    }
-
-    // Verify microphone permission first
-    const perm = await this.requestMicPermission();
-    if (!perm.granted && perm.error) {
-      onError(perm.error);
-      return;
-    }
-
+    this.activeLangCode = langCode;
     this.wantListening = true;
     this.onStartCallback = onStart || null;
     this.onEndCallback = onEnd || null;
 
-    if (this.recognition) {
-      try {
-        this.recognition.abort();
-      } catch {
-        // ignore
-      }
-    }
-
-    const langObj = SUPPORTED_LANGUAGES.find((l) => l.code === langCode);
-    const bcp47 = langObj ? langObj.bcp47 : "en-US";
-
-    try {
-      this.recognition = new SpeechRec();
-      this.recognition.continuous = true;
-      this.recognition.interimResults = true;
-      this.recognition.lang = bcp47;
-
-      this.recognition.onstart = () => {
-        this.isListening = true;
-        if (this.onStartCallback) this.onStartCallback();
-      };
-
-      this.recognition.onresult = (event: SpeechRecognitionEvent) => {
-        let fullTranscript = "";
-        let isFinal = false;
-
-        for (let i = 0; i < event.results.length; ++i) {
-          fullTranscript += event.results[i][0].transcript;
-          if (event.results[i].isFinal) {
-            isFinal = true;
-          }
-        }
-
-        if (fullTranscript.trim()) {
-          onTranscript(fullTranscript.trim(), isFinal);
-        }
-      };
-
-      this.recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-        // 'no-speech' is routine pause between sentences, keep listening
-        if (event.error === "no-speech") {
-          return;
-        }
-
-        if (event.error === "not-allowed" || event.error === "service-not-allowed") {
-          this.wantListening = false;
-          this.isListening = false;
-          onError("Microphone permission denied. Allow mic access in browser settings.");
-          return;
-        }
-
-        if (event.error === "network") {
-          console.warn("Speech recognition network error, retrying...");
-          return;
-        }
-
-        console.warn("Speech recognition error:", event.error);
-      };
-
-      this.recognition.onend = () => {
-        // Chrome frequently stops speech recognition after short silence pauses.
-        // If the user hasn't explicitly clicked stop, auto-restart to stay live.
-        if (this.wantListening) {
-          try {
-            this.recognition?.start();
-          } catch {
-            this.isListening = false;
-            if (this.onEndCallback) this.onEndCallback();
-          }
-        } else {
-          this.isListening = false;
-          if (this.onEndCallback) this.onEndCallback();
-        }
-      };
-
-      this.recognition.start();
-    } catch (e) {
-      console.error(e);
+    // 1. Acquire microphone stream
+    const perm = await this.requestMicPermission();
+    if (!perm.granted || !perm.stream) {
       this.wantListening = false;
       this.isListening = false;
-      onError("Failed to initialize microphone.");
+      onError(perm.error || "Microphone access failed.");
+      return;
+    }
+
+    this.mediaStream = perm.stream;
+    this.audioChunks = [];
+
+    // 2. Setup MediaRecorder for audio capture to feed Groq Whisper
+    try {
+      const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
+        ? "audio/webm;codecs=opus"
+        : MediaRecorder.isTypeSupported("audio/webm")
+        ? "audio/webm"
+        : "audio/ogg";
+
+      this.mediaRecorder = new MediaRecorder(this.mediaStream, { mimeType });
+      this.mediaRecorder.ondataavailable = (event) => {
+        if (event.data && event.data.size > 0) {
+          this.audioChunks.push(event.data);
+        }
+      };
+
+      this.mediaRecorder.onstop = async () => {
+        if (this.audioChunks.length > 0) {
+          const audioBlob = new Blob(this.audioChunks, { type: mimeType });
+          // Send to Groq Whisper for sub-second, highly accurate transcription
+          const whisperText = await this.transcribeWithGroq(audioBlob, this.activeLangCode);
+          if (whisperText) {
+            onTranscript(whisperText, true);
+          }
+        }
+        // Release hardware audio tracks
+        this.mediaStream?.getTracks().forEach((track) => track.stop());
+        this.mediaStream = null;
+      };
+
+      this.mediaRecorder.start(250); // Slice every 250ms
+    } catch (recorderErr) {
+      console.warn("MediaRecorder initialization fallback:", recorderErr);
+    }
+
+    // 3. Setup Browser Web Speech API for instantaneous zero-latency interim live display
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRec) {
+      if (this.recognition) {
+        try {
+          this.recognition.abort();
+        } catch {
+          // ignore
+        }
+      }
+
+      const langObj = SUPPORTED_LANGUAGES.find((l) => l.code === langCode);
+      const bcp47 = langObj ? langObj.bcp47 : "en-US";
+
+      try {
+        this.recognition = new SpeechRec();
+        this.recognition.continuous = true;
+        this.recognition.interimResults = true;
+        this.recognition.lang = bcp47;
+
+        this.recognition.onstart = () => {
+          this.isListening = true;
+          if (this.onStartCallback) this.onStartCallback();
+        };
+
+        this.recognition.onresult = (event: SpeechRecognitionEvent) => {
+          let fullTranscript = "";
+          let isFinal = false;
+
+          for (let i = 0; i < event.results.length; ++i) {
+            fullTranscript += event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+              isFinal = true;
+            }
+          }
+
+          if (fullTranscript.trim()) {
+            // Live typing feedback
+            onTranscript(fullTranscript.trim(), isFinal);
+          }
+        };
+
+        this.recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+          if (event.error === "no-speech") return;
+          if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+            this.wantListening = false;
+            this.isListening = false;
+            onError("Microphone permission denied.");
+            return;
+          }
+          console.warn("Speech recognition warning:", event.error);
+        };
+
+        this.recognition.onend = () => {
+          if (this.wantListening) {
+            try {
+              this.recognition?.start();
+            } catch {
+              // will finish via stopListening
+            }
+          }
+        };
+
+        this.recognition.start();
+      } catch (recInitErr) {
+        console.warn("WebSpeech recognition start failed:", recInitErr);
+      }
+    } else {
+      // Browser doesn't have Web Speech, but MediaRecorder is active
+      this.isListening = true;
+      if (this.onStartCallback) this.onStartCallback();
     }
   }
 
-  // Stop listening explicitly
+  // Stop listening explicitly and trigger Groq Whisper processing
   public stopListening() {
     this.wantListening = false;
     this.isListening = false;
+
+    // Stop Web Speech
     if (this.recognition) {
       try {
         this.recognition.stop();
@@ -210,6 +275,16 @@ class SpeechEngine {
         // ignore
       }
     }
+
+    // Stop MediaRecorder which triggers onstop -> Groq Whisper API
+    if (this.mediaRecorder && this.mediaRecorder.state !== "inactive") {
+      try {
+        this.mediaRecorder.stop();
+      } catch (err) {
+        console.warn("Error stopping MediaRecorder:", err);
+      }
+    }
+
     if (this.onEndCallback) {
       this.onEndCallback();
     }
@@ -226,7 +301,7 @@ class SpeechEngine {
     }
   }
 
-  // Speak with dynamic thermal scaling
+  // Speak with dynamic thermal scaling & natural neural voice prioritization
   public speak(text: string, langCode: string, heatScore: number = 50) {
     if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
 
@@ -236,19 +311,28 @@ class SpeechEngine {
     const langObj = SUPPORTED_LANGUAGES.find((l) => l.code === langCode);
     utterance.lang = langObj ? langObj.bcp47 : "en-US";
 
-    const rateMultiplier = 1.0 + (heatScore / 100) * 0.25;
-    const pitchMultiplier = 0.95 + (heatScore / 100) * 0.25;
+    // Dynamic thermal pacing: higher heat = slightly faster, more urgent delivery
+    const rateMultiplier = 1.0 + (heatScore / 100) * 0.22;
+    const pitchMultiplier = 0.96 + (heatScore / 100) * 0.2;
 
-    utterance.rate = Math.min(1.35, Math.max(0.9, rateMultiplier));
-    utterance.pitch = Math.min(1.3, Math.max(0.95, pitchMultiplier));
+    utterance.rate = Math.min(1.3, Math.max(0.9, rateMultiplier));
+    utterance.pitch = Math.min(1.25, Math.max(0.95, pitchMultiplier));
 
     const voices = window.speechSynthesis.getVoices();
-    const prefix = langObj ? langObj.code : "en";
-    const voice = voices.find(
+    const prefix = langObj ? langObj.code.toLowerCase() : "en";
+    const matchingVoices = voices.filter(
       (v) => v.lang.toLowerCase().startsWith(prefix) || v.lang.toLowerCase().includes(prefix)
     );
-    if (voice) {
-      utterance.voice = voice;
+
+    // Prioritize high-fidelity natural / neural human voices
+    matchingVoices.sort((a, b) => {
+      const scoreA = /natural|neural|online|multilingual/i.test(a.name) ? 3 : /google/i.test(a.name) ? 2 : 1;
+      const scoreB = /natural|neural|online|multilingual/i.test(b.name) ? 3 : /google/i.test(b.name) ? 2 : 1;
+      return scoreB - scoreA;
+    });
+
+    if (matchingVoices.length > 0) {
+      utterance.voice = matchingVoices[0];
     }
 
     window.speechSynthesis.speak(utterance);

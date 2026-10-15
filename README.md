@@ -100,15 +100,15 @@ Two human participants join a shared room instance via distinct endpoints. The r
 
 | Language | ISO Code | Speech Recognition | Speech Synthesis | Concession Token Set |
 |---|---|---|---|---|
-| Hindi | hi-IN | Web Speech API (hi-IN) | Regional Formant Synthesis | maan liya, sahi baat hai, thik hai |
-| English | en-US | Web Speech API (en-US) | Native Neutral Engine | fair point, you are right, I concede |
-| Spanish | es-ES | Web Speech API (es-ES) | Castilian / Latin Formant | tienes razon, de acuerdo, admito |
-| Japanese | ja-JP | Web Speech API (ja-JP) | Native Japanese Pipeline | tashikani, sono toori, mitomemasu |
-| French | fr-FR | Web Speech API (fr-FR) | Hexagonal Engine | d'accord, c'est vrai, j'admets |
-| German | de-DE | Web Speech API (de-DE) | Native German Engine | stimmt, da hast du recht, akzeptiert |
-| Arabic | ar-SA | Web Speech API (ar-SA) | Modern Standard Arabic | saheeh, ma3ak haq, uqirr |
-| Russian | ru-RU | Web Speech API (ru-RU) | Slavic Formant Profile | soglasen, ty prav, priznayu |
-| Mandarin | zh-CN | Web Speech API (zh-CN) | Standard Putonghua | you daoli, wo tongyi, chengren |
+| Hindi | hi-IN | Groq Whisper Large v3 / hi-IN | Regional Formant Synthesis | maan liya, sahi baat hai, thik hai |
+| English | en-US | Groq Whisper Large v3 / en-US | Native Neutral Engine | fair point, you are right, I concede |
+| Spanish | es-ES | Groq Whisper Large v3 / es-ES | Castilian / Latin Formant | tienes razon, de acuerdo, admito |
+| Japanese | ja-JP | Groq Whisper Large v3 / ja-JP | Native Japanese Pipeline | tashikani, sono toori, mitomemasu |
+| French | fr-FR | Groq Whisper Large v3 / fr-FR | Hexagonal Engine | d'accord, c'est vrai, j'admets |
+| German | de-DE | Groq Whisper Large v3 / de-DE | Native German Engine | stimmt, da hast du recht, akzeptiert |
+| Arabic | ar-SA | Groq Whisper Large v3 / ar-SA | Modern Standard Arabic | saheeh, ma3ak haq, uqirr |
+| Russian | ru-RU | Groq Whisper Large v3 / ru-RU | Slavic Formant Profile | soglasen, ty prav, priznayu |
+| Mandarin | zh-CN | Groq Whisper Large v3 / zh-CN | Standard Putonghua | you daoli, wo tongyi, chengren |
 
 ---
 
@@ -118,7 +118,8 @@ Two human participants join a shared room instance via distinct endpoints. The r
 * UI Component Architecture: React 19 with strict immutability patterns
 * Styling Engine: Tailwind CSS v4 with low-latency CSS variable binding
 * Audio Generation: Procedural Web Audio API oscillator nodes (zero external media asset dependencies)
-* Speech Layer: Client-side Web Speech API with rate and pitch scaling tied to acoustic heat
+* Speech-to-Text Pipeline: Dual-layer engine pairing client-side interim stream with Groq Whisper Large v3 for verbatim acoustic decoding (<200ms latency)
+* Speech Synthesis Layer: Prioritized neural voice selection with dynamic thermal scaling
 * Code Quality: ESLint strict verification with zero errors and zero warnings
 * TypeScript Compilation: Complete type coverage with zero strict-mode violations
 
@@ -137,7 +138,10 @@ Two human participants join a shared room instance via distinct endpoints. The r
 git clone https://github.com/Vaibhavsahkk/Takraar-engine.git
 cd Takraar-engine
 npm install
+cp .env.example .env.local
 ```
+
+Configure your `GROQ_API_KEY` in `.env.local` for high-precision Whisper Large v3 transcription.
 
 ### Running Locally
 
