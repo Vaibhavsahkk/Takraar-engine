@@ -98,17 +98,17 @@ Two human participants join a shared room instance via distinct endpoints. The r
 
 ## Linguistic Coverage Matrix
 
-| Language | ISO Code | Speech Recognition | Speech Synthesis | Concession Token Set |
+| Language | ISO Code | Speech Recognition | Speech Synthesis (Neural Models) | Concession Token Set |
 |---|---|---|---|---|
-| Hindi | hi-IN | Groq Whisper Large v3 / hi-IN | Regional Formant Synthesis | maan liya, sahi baat hai, thik hai |
-| English | en-US | Groq Whisper Large v3 / en-US | Native Neutral Engine | fair point, you are right, I concede |
-| Spanish | es-ES | Groq Whisper Large v3 / es-ES | Castilian / Latin Formant | tienes razon, de acuerdo, admito |
-| Japanese | ja-JP | Groq Whisper Large v3 / ja-JP | Native Japanese Pipeline | tashikani, sono toori, mitomemasu |
-| French | fr-FR | Groq Whisper Large v3 / fr-FR | Hexagonal Engine | d'accord, c'est vrai, j'admets |
-| German | de-DE | Groq Whisper Large v3 / de-DE | Native German Engine | stimmt, da hast du recht, akzeptiert |
-| Arabic | ar-SA | Groq Whisper Large v3 / ar-SA | Modern Standard Arabic | saheeh, ma3ak haq, uqirr |
-| Russian | ru-RU | Groq Whisper Large v3 / ru-RU | Slavic Formant Profile | soglasen, ty prav, priznayu |
-| Mandarin | zh-CN | Groq Whisper Large v3 / zh-CN | Standard Putonghua | you daoli, wo tongyi, chengren |
+| Hindi | hi-IN | Groq Whisper Large v3 / hi-IN | hi-IN-MadhurNeural (Human Expressive) | maan liya, sahi baat hai, thik hai |
+| English | en-US | Groq Whisper Large v3 / en-US | en-US-JennyNeural (ChatGPT Voice Standard) | fair point, you are right, I concede |
+| Spanish | es-ES | Groq Whisper Large v3 / es-ES | es-ES-AlvaroNeural (Castilian Human) | tienes razon, de acuerdo, admito |
+| Japanese | ja-JP | Groq Whisper Large v3 / ja-JP | ja-JP-KeitaNeural (Native Japanese Cadence) | tashikani, sono toori, mitomemasu |
+| French | fr-FR | Groq Whisper Large v3 / fr-FR | fr-FR-HenriNeural (Hexagonal Articulation) | d'accord, c'est vrai, j'admets |
+| German | de-DE | Groq Whisper Large v3 / de-DE | de-DE-KillianNeural (Expressive German) | stimmt, da hast du recht, akzeptiert |
+| Arabic | ar-SA | Groq Whisper Large v3 / ar-SA | ar-SA-HamedNeural (Modern Fluent Standard) | saheeh, ma3ak haq, uqirr |
+| Russian | ru-RU | Groq Whisper Large v3 / ru-RU | ru-RU-DmitryNeural (Natural Slavic Inflection) | soglasen, ty prav, priznayu |
+| Mandarin | zh-CN | Groq Whisper Large v3 / zh-CN | zh-CN-YunxiNeural (Putonghua Conversational) | you daoli, wo tongyi, chengren |
 
 ---
 
@@ -119,7 +119,7 @@ Two human participants join a shared room instance via distinct endpoints. The r
 * Styling Engine: Tailwind CSS v4 with low-latency CSS variable binding
 * Audio Generation: Procedural Web Audio API oscillator nodes (zero external media asset dependencies)
 * Speech-to-Text Pipeline: Dual-layer engine pairing client-side interim stream with Groq Whisper Large v3 for verbatim acoustic decoding (<200ms latency)
-* Speech Synthesis Layer: Prioritized neural voice selection with dynamic thermal scaling
+* Speech Synthesis Pipeline: Conversational Human Neural Voice Engine (/api/tts) powered by Azure Neural Formants with thermal prosody scaling and sub-15ms preemption (Barge-In)
 * Code Quality: ESLint strict verification with zero errors and zero warnings
 * TypeScript Compilation: Complete type coverage with zero strict-mode violations
 

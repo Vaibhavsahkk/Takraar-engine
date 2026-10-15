@@ -290,52 +290,114 @@ class SpeechEngine {
     }
   }
 
-  public getIsListening(): boolean {
-    return this.isListening;
-  }
+  // Active audio element for neural speech playback
+  private activeAudio: HTMLAudioElement | null = null;
+  private activeAudioUrl: string | null = null;
 
-  // Preempt active speech synthesis immediately (Barge-In)
+  // Preempt active speech immediately (Barge-In)
   public interruptSpeech() {
+    if (this.activeAudio) {
+      try {
+        this.activeAudio.pause();
+        this.activeAudio.currentTime = 0;
+      } catch {
+        // ignore
+      }
+      this.activeAudio = null;
+    }
+    if (this.activeAudioUrl) {
+      try {
+        URL.revokeObjectURL(this.activeAudioUrl);
+      } catch {
+        // ignore
+      }
+      this.activeAudioUrl = null;
+    }
     if (typeof window !== "undefined" && "speechSynthesis" in window) {
       window.speechSynthesis.cancel();
     }
   }
 
-  // Speak with dynamic thermal scaling & natural neural voice prioritization
-  public speak(text: string, langCode: string, heatScore: number = 50) {
+  // Fallback to local browser speech synthesis only if network is offline
+  private speakLocalFallback(text: string, langCode: string, heatScore: number = 50) {
     if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    try {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      const langObj = SUPPORTED_LANGUAGES.find((l) => l.code === langCode);
+      utterance.lang = langObj ? langObj.bcp47 : "en-US";
 
-    window.speechSynthesis.cancel();
+      const rateMultiplier = 1.0 + (heatScore / 100) * 0.22;
+      utterance.rate = Math.min(1.3, Math.max(0.9, rateMultiplier));
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    const langObj = SUPPORTED_LANGUAGES.find((l) => l.code === langCode);
-    utterance.lang = langObj ? langObj.bcp47 : "en-US";
-
-    // Dynamic thermal pacing: higher heat = slightly faster, more urgent delivery
-    const rateMultiplier = 1.0 + (heatScore / 100) * 0.22;
-    const pitchMultiplier = 0.96 + (heatScore / 100) * 0.2;
-
-    utterance.rate = Math.min(1.3, Math.max(0.9, rateMultiplier));
-    utterance.pitch = Math.min(1.25, Math.max(0.95, pitchMultiplier));
-
-    const voices = window.speechSynthesis.getVoices();
-    const prefix = langObj ? langObj.code.toLowerCase() : "en";
-    const matchingVoices = voices.filter(
-      (v) => v.lang.toLowerCase().startsWith(prefix) || v.lang.toLowerCase().includes(prefix)
-    );
-
-    // Prioritize high-fidelity natural / neural human voices
-    matchingVoices.sort((a, b) => {
-      const scoreA = /natural|neural|online|multilingual/i.test(a.name) ? 3 : /google/i.test(a.name) ? 2 : 1;
-      const scoreB = /natural|neural|online|multilingual/i.test(b.name) ? 3 : /google/i.test(b.name) ? 2 : 1;
-      return scoreB - scoreA;
-    });
-
-    if (matchingVoices.length > 0) {
-      utterance.voice = matchingVoices[0];
+      const voices = window.speechSynthesis.getVoices();
+      const prefix = langObj ? langObj.code.toLowerCase() : "en";
+      const matching = voices.filter(
+        (v) => v.lang.toLowerCase().startsWith(prefix) || v.lang.toLowerCase().includes(prefix)
+      );
+      if (matching.length > 0) utterance.voice = matching[0];
+      window.speechSynthesis.speak(utterance);
+    } catch {
+      // ignore
     }
+  }
 
-    window.speechSynthesis.speak(utterance);
+  // Speak with conversational human neural voice (like ChatGPT / Gemini Live)
+  public async speak(text: string, langCode: string, heatScore: number = 50) {
+    if (typeof window === "undefined") return;
+
+    // Immediate interruption of any ongoing speech (Barge-In)
+    this.interruptSpeech();
+
+    const cleanText = text
+      .replace(/\[.*?\]/g, "")
+      .replace(/[#*`_~]/g, "")
+      .trim();
+
+    if (!cleanText) return;
+
+    try {
+      const response = await fetch("/api/tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: cleanText,
+          lang: langCode,
+          heatScore,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`TTS server returned status ${response.status}`);
+      }
+
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      this.activeAudioUrl = audioUrl;
+
+      const audio = new Audio(audioUrl);
+      this.activeAudio = audio;
+
+      audio.onended = () => {
+        if (this.activeAudioUrl === audioUrl) {
+          URL.revokeObjectURL(audioUrl);
+          this.activeAudioUrl = null;
+        }
+        if (this.activeAudio === audio) {
+          this.activeAudio = null;
+        }
+      };
+
+      audio.onerror = () => {
+        console.warn("Neural audio playback failed, falling back to local synthesis.");
+        this.speakLocalFallback(cleanText, langCode, heatScore);
+      };
+
+      await audio.play();
+    } catch (err) {
+      console.warn("Neural TTS request failed, using fallback:", err);
+      this.speakLocalFallback(cleanText, langCode, heatScore);
+    }
   }
 }
 
