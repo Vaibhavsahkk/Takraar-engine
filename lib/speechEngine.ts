@@ -66,6 +66,7 @@ class SpeechEngine {
   private audioChunks: Blob[] = [];
   private mediaStream: MediaStream | null = null;
   private activeLangCode: string = "en";
+  private networkErrorCount: number = 0;
 
   public isRecognitionSupported(): boolean {
     if (typeof window === "undefined") return false;
@@ -139,6 +140,7 @@ class SpeechEngine {
 
     this.activeLangCode = langCode;
     this.wantListening = true;
+    this.networkErrorCount = 0;
     this.onStartCallback = onStart || null;
     this.onEndCallback = onEnd || null;
 
@@ -238,13 +240,28 @@ class SpeechEngine {
             onError("Microphone permission denied.");
             return;
           }
+          if (event.error === "network") {
+            this.networkErrorCount++;
+            if (this.networkErrorCount >= 2) {
+              // Break infinite retry loop; fall back cleanly to MediaRecorder + Groq Whisper
+              try {
+                this.recognition?.abort();
+              } catch {
+                // ignore
+              }
+              this.recognition = null;
+              onError("Browser speech network unavailable. Audio recording active — speak freely, Whisper will transcribe upon stop.");
+              return;
+            }
+            return;
+          }
           console.warn("Speech recognition warning:", event.error);
         };
 
         this.recognition.onend = () => {
-          if (this.wantListening) {
+          if (this.wantListening && this.recognition && this.networkErrorCount < 2) {
             try {
-              this.recognition?.start();
+              this.recognition.start();
             } catch {
               // will finish via stopListening
             }

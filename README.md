@@ -1,6 +1,14 @@
 # TAKRAAR (तकरार)
 ### Distributed Full-Duplex Multilingual Dispute Runtime
 
+[![Live Deployment](https://img.shields.io/badge/Live_Deployment-takraar--engine.vercel.app-blue?style=flat-square)](https://takraar-engine.vercel.app)
+[![Assignment Deliverables](https://img.shields.io/badge/ZERO_Deliverables-ASSIGNMENT__DELIVERABLES.md-amber?style=flat-square)](./ASSIGNMENT_DELIVERABLES.md)
+
+* **Official Deliverables Document:** [ASSIGNMENT_DELIVERABLES.md](./ASSIGNMENT_DELIVERABLES.md) (Contains the three 150-word product analyses for The Middle Market, CLOSURE, and ISHQweds, verified via multi-agent simulation).
+* **Live Production URL:** [https://takraar-engine.vercel.app](https://takraar-engine.vercel.app)
+* **Source Repository:** [https://github.com/Vaibhavsahkk/Takraar-engine.git](https://github.com/Vaibhavsahkk/Takraar-engine.git)
+* **Official ZERO Submission Portal:** [zero4genz.in/interview/e4fc6d4bf4e0c9ad29fa07800eff312c](https://www.zero4genz.in/interview/e4fc6d4bf4e0c9ad29fa07800eff312c)
+
 TAKRAAR is a specialized real-time communication system engineered for unconstrained verbal and textual conflict across natural language barriers. Traditional automated translation and computer-mediated communication platforms enforce polite, turn-based turn-taking protocols. In genuine human dispute, participants do not wait for translation latency; they talk over one another, seize conversational floor custody, escalate emotional velocity, and revise core stances under argumentative pressure.
 
 TAKRAAR provides a sub-second, full-duplex runtime featuring hardware-accelerated speech synthesis preemption (Barge-In), dynamic emotional heat quantification, and deterministic concession tracking with an immutable consensus ledger.

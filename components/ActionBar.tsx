@@ -161,43 +161,46 @@ export const ActionBar: React.FC<ActionBarProps> = ({
         </div>
 
         {/* Primary Controls Bar */}
-        <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center">
-          {/* THE PREEMPTION BARGE IN BUTTON */}
-          <button
-            onClick={triggerBargeIn}
-            title="Preempt opponent transmission (Press Space outside input)"
-            className="btn-barge-in flex items-center justify-center gap-2 rounded-lg py-2.5 px-4 font-mono font-extrabold uppercase tracking-wider sm:w-48 select-none"
-          >
-            <Zap className="h-4 w-4 animate-bounce" />
-            <span>BARGE IN</span>
-            <span className="hidden lg:inline text-[9px] bg-black/40 text-white px-1.5 py-0.5 rounded font-mono">SPACE</span>
-          </button>
-
-          {/* Language Selector */}
-          <div className="flex items-center gap-1.5 shrink-0 bg-[#090e18] border border-[#18243a] rounded-lg px-2.5 py-1.5">
-            <span className="text-[10px] font-mono text-sky-400/80 uppercase">Language:</span>
-            <select
-              value={userLang}
-              onChange={(e) => {
-                onChangeUserLang(e.target.value);
-                if (isListening) {
-                  speechEngine.stopListening();
-                  setIsListening(false);
-                  setMicStatus(null);
-                }
-              }}
-              className="bg-transparent text-xs font-mono font-semibold text-sky-100 focus:outline-none cursor-pointer"
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center w-full">
+          {/* Top row on mobile: BARGE IN and Language side-by-side */}
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            {/* THE PREEMPTION BARGE IN BUTTON */}
+            <button
+              onClick={triggerBargeIn}
+              title="Preempt opponent transmission (Press Space outside input)"
+              className="btn-barge-in flex flex-1 sm:flex-none items-center justify-center gap-1.5 sm:gap-2 rounded-lg py-2 sm:py-2.5 px-3 sm:px-4 font-mono font-extrabold uppercase tracking-wider sm:w-44 select-none text-xs sm:text-sm"
             >
-              {SUPPORTED_LANGUAGES.map((lang) => (
-                <option key={lang.code} value={lang.code} className="bg-[#090e18] text-[#f1f5f9]">
-                  {lang.flag} {lang.name} ({lang.nativeName})
-                </option>
-              ))}
-            </select>
+              <Zap className="h-3.5 w-3.5 sm:h-4 sm:w-4 animate-bounce" />
+              <span>BARGE IN</span>
+              <span className="hidden lg:inline text-[9px] bg-black/40 text-white px-1.5 py-0.5 rounded font-mono">SPACE</span>
+            </button>
+
+            {/* Language Selector */}
+            <div className="flex items-center gap-1 shrink-0 bg-[#090e18] border border-[#18243a] rounded-lg px-2 py-1.5 sm:px-2.5">
+              <span className="hidden sm:inline text-[10px] font-mono text-sky-400/80 uppercase">Lang:</span>
+              <select
+                value={userLang}
+                onChange={(e) => {
+                  onChangeUserLang(e.target.value);
+                  if (isListening) {
+                    speechEngine.stopListening();
+                    setIsListening(false);
+                    setMicStatus(null);
+                  }
+                }}
+                className="bg-transparent text-xs font-mono font-semibold text-sky-100 focus:outline-none cursor-pointer max-w-[130px] sm:max-w-none truncate"
+              >
+                {SUPPORTED_LANGUAGES.map((lang) => (
+                  <option key={lang.code} value={lang.code} className="bg-[#090e18] text-[#f1f5f9]">
+                    {lang.flag} {lang.name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {/* Input Box & Tactical Controls */}
-          <div className="relative flex flex-1 items-center">
+          <div className="relative flex flex-1 items-center w-full min-w-0">
             <input
               ref={inputRef}
               type="text"

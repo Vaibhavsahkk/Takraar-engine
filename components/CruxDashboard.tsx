@@ -38,24 +38,24 @@ export const CruxDashboard: React.FC<CruxDashboardProps> = ({
   const consensusProgress = Math.max(0, Math.min(100, Math.round(100 - averageStubbornness)));
 
   return (
-    <div className="border-b border-[#141e30] bg-[#07090f] px-4 py-3 sm:px-6">
+    <div className="border-b border-[#141e30] bg-[#07090f] px-3 py-2.5 sm:px-6 sm:py-3 w-full max-w-full overflow-hidden">
       <div className="mx-auto max-w-7xl">
         {/* Topic & Crux Banner */}
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <span className="font-mono text-[10px] uppercase tracking-wider text-amber-300 font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-400/30">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-mono text-[10px] uppercase tracking-wider text-amber-300 font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-400/30 shrink-0">
                 ACTIVE DISPUTE CRUX
               </span>
-              <span className="text-xs font-mono text-[#94a3b8]">{topic}</span>
+              <span className="text-xs font-mono text-[#94a3b8] truncate">{topic}</span>
             </div>
-            <h2 className="mt-1 font-mono text-sm sm:text-base font-bold text-[#f1f5f9] tracking-tight">
+            <h2 className="mt-1 font-mono text-sm sm:text-base font-bold text-[#f1f5f9] tracking-tight break-words">
               {crux}
             </h2>
           </div>
 
           {/* Consensus Progress Bar */}
-          <div className="flex items-center gap-4 lg:w-80">
+          <div className="flex items-center gap-3 sm:gap-4 w-full lg:w-80">
             <div className="flex-1">
               <div className="flex items-center justify-between text-xs font-mono">
                 <span className="text-[#94a3b8] flex items-center gap-1.5">

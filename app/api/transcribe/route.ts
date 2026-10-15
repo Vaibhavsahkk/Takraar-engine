@@ -10,7 +10,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const formData = await req.formData();
+    let formData: FormData;
+    try {
+      formData = await req.formData();
+    } catch {
+      return NextResponse.json(
+        { error: "Invalid multipart form data or missing audio body." },
+        { status: 400 }
+      );
+    }
+
     const file = formData.get("file") as Blob | null;
     const language = formData.get("language") as string | null;
 
